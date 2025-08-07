@@ -60,8 +60,8 @@ export default function DetailArtikel() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto py-8 px-4">
-      <nav className="text-sm md:text-sm text-gray-500 mb-4">
+    <div className="max-w-5xl mx-auto py-4 px-4">
+      {/* <nav className="text-sm md:text-sm text-gray-500 mb-4">
         <div className="flex flex-wrap items-center">
           <Link to="/artikel" className="text-primary hover:underline">
             Artikel
@@ -69,21 +69,25 @@ export default function DetailArtikel() {
           <span className="mx-2">{">"}</span>
           <span className="text-gray-700">Detail Artikel</span>
         </div>
-      </nav>
+      </nav> */}
 
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-extrabold py-4">Detail Artikel</h1>
-        {user && artikel.artikelUid == user._id && (
-          <button onClick={handleDelete} className="text-red-600 hover:text-red-800 flex items-center gap-2">
-            <FaTrash /> Hapus
-          </button>
-        )}
-      </div>
 
-      <div className="max-w-4xl mx-auto bg-white rounded shadow-md p-6">
+      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <div className="flex justify-end items-center mb-4">
+          {user && artikel.artikelUid == user._id && (
+            <button
+              onClick={handleDelete}
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-red-200 text-red-600 rounded-lg
+                hover:bg-red-50 transition-all duration-200 font-medium text-sm shadow-sm
+                focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+            >
+              <FaTrash className="w-4 h-4" />
+              <span>Hapus Artikel</span>
+            </button>
+          )}
+        </div>
+        <h2 className="text-3xl font-semibold mb-6 mt-0">{artikel.judulArtikel}</h2>
         <img src={artikel.coverUrl} alt="Gambar Artikel" className="w-full rounded-md mb-4 object-cover h-64" />
-        <h2 className="text-3xl font-semibold my-8">{artikel.judulArtikel}</h2>
-
         <div className="flex items-center justify-between mb-4">
           <Link to={`/view-profil/${artikel.artikelUid}`} className="informasiPengupload flex gap-3 items-center">
             <img src={artikel.fotoProfil} alt={artikel.namaLengkap} className="w-12 h-12 rounded-full object-cover" />
@@ -100,6 +104,7 @@ export default function DetailArtikel() {
             })}
           </span>
         </div>
+
 
         <div className="text-gray-800 text-lg leading-relaxed space-y-4 mt-6">
           <p>{artikel.deskArtikel}</p>
