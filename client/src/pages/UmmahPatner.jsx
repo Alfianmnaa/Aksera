@@ -37,7 +37,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = "/pdf-worker/pdf.worker.min.js";
 // Konfigurasi Mermaid.js sekali saat aplikasi dimuat
 mermaid.initialize({
   startOnLoad: false,
-  theme: "forest",
+  theme: "forest", // Tetap forest, karena ini tema diagram, bukan UI
   fontFamily: "Inter, sans-serif",
 });
 
@@ -45,14 +45,14 @@ mermaid.initialize({
 const Flashcard = ({ question, answer }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   return (
-    <div className="flashcard-container perspective-1000 w-full max-w-sm mx-auto h-64 cursor-pointer" onClick={() => setIsFlipped(!isFlipped)}>
+    <div className="flashcard-container perspective-1000 w-full max-w-sm mx-auto h-64 cursor-pointer rounded-xl" onClick={() => setIsFlipped(!isFlipped)}>
       <div className={`relative w-full h-full transform-style-3d transition-transform duration-500 rounded-xl shadow-lg ${isFlipped ? "rotate-y-180" : ""}`}>
         {/* Front side */}
-        <div className="absolute backface-hidden w-full h-full bg-white rounded-xl flex items-center justify-center p-6 text-center text-gray-800">
+        <div className="absolute backface-hidden w-full h-full bg-white rounded-xl flex items-center justify-center p-6 text-center text-gray-800 border border-gray-200">
           <p className="font-semibold text-lg">{question}</p>
         </div>
-        {/* Back side */}
-        <div className="absolute backface-hidden rotate-y-180 w-full h-full bg-[#F79319] rounded-xl flex items-center justify-center p-6 text-center text-white">
+        {/* Back side - Updated to blue theme */}
+        <div className="absolute backface-hidden rotate-y-180 w-full h-full bg-[#045394] rounded-xl flex items-center justify-center p-6 text-center text-white">
           <p className="text-lg">{answer}</p>
         </div>
       </div>
@@ -262,7 +262,7 @@ export default function UmmahPartner() {
       text: "Sesi chat ini akan dihapus permanen!",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#F79319",
+      confirmButtonColor: "#045394", // Updated color
       cancelButtonColor: "#d33",
       confirmButtonText: "Ya, hapus!",
     }).then(async (result) => {
@@ -430,7 +430,7 @@ export default function UmmahPartner() {
       };
     }
 
-    const apiKey = "";
+    const apiKey = "AIzaSyCh6EAMccK82g-VqX4dOr1kVGYmACK6wkM";
 
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
@@ -473,7 +473,7 @@ export default function UmmahPartner() {
         showCancelButton: true,
         confirmButtonText: "Login Sekarang",
         cancelButtonText: "Nanti Saja",
-        confirmButtonColor: "#F79319",
+        confirmButtonColor: "#045394", // Updated color
       }).then((result) => {
         if (result.isConfirmed) {
           window.location.href = "/masuk";
@@ -793,24 +793,24 @@ export default function UmmahPartner() {
       if (q.type === "multipleChoice" && q.options) {
         const alphabet = ["A", "B", "C", "D"];
         q.options.forEach((option, optIndex) => {
-          const optionPrefix = `   ${alphabet[optIndex]}. `;
+          const optionPrefix = `    ${alphabet[optIndex]}. `;
           const optionLines = doc.splitTextToSize(option, maxTextWidth - doc.getTextWidth(optionPrefix));
           doc.text(optionPrefix, margin, yPos);
           doc.text(optionLines, margin + doc.getTextWidth(optionPrefix), yPos);
           yPos += optionLines.length * lineHeight;
         });
       } else if (q.type === "fillInTheBlank") {
-        doc.text("   (Fill in the answer here)", margin, yPos);
+        doc.text("    (Isi jawaban di sini)", margin, yPos);
         yPos += lineHeight;
       }
 
       doc.setFontSize(10);
-      doc.setTextColor(0, 128, 0);
+      doc.setTextColor(0, 128, 0); // Green color for answer
       const answerPrefix = "Jawaban: ";
       const answerLines = doc.splitTextToSize(q.answer, maxTextWidth - doc.getTextWidth(answerPrefix));
       doc.text(answerPrefix, margin, yPos);
       doc.text(answerLines, margin + doc.getTextWidth(answerPrefix), yPos);
-      doc.setTextColor(0, 0, 0);
+      doc.setTextColor(0, 0, 0); // Reset color to black
       yPos += answerLines.length * lineHeight;
 
       yPos += lineHeight;
@@ -850,14 +850,14 @@ export default function UmmahPartner() {
         <div className="flex-1 flex flex-col ">
           <div ref={chatContainerRef} className="overflow-y-auto space-y-4 bg-gray-50 px-6 py-4 h-[calc(100vh-144px)]">
             {chatHistory.length === 0 ? (
-              <div className="text-center text-gray-500 mt-10 p-4 bg-white rounded-xl shadow-sm">
+              <div className="text-center text-gray-500 mt-10 p-4 bg-white rounded-xl shadow-sm border border-gray-200">
                 <p className="text-lg mb-2">Halo, aku Ummah Partner AI!</p>
                 <p className="text-sm">Mulai chat baru atau klik "Lihat Riwayat Percakapan" di panel kiri untuk melanjutkan sesi lama.</p>
               </div>
             ) : (
               chatHistory.map((msg, index) => (
                 <div key={index} className={`flex items-start ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[80%] p-4 rounded-xl shadow-md relative ${msg.role === "user" ? "bg-[#316B6C] text-white rounded-br-none" : "bg-gray-200 text-gray-800 rounded-bl-none"}`}>
+                  <div className={`max-w-[80%] p-4 rounded-xl shadow-md relative ${msg.role === "user" ? "bg-[#045394] text-white rounded-br-none" : "bg-gray-200 text-gray-800 rounded-bl-none"}`}>
                     <p className="font-semibold mb-1 flex items-center">
                       {msg.role === "user" ? (
                         <>
@@ -871,7 +871,7 @@ export default function UmmahPartner() {
                       <button
                         onClick={() => handleCopyChat(msg.parts[0].text)}
                         className={`ml-auto opacity-70 hover:opacity-100 transition-opacity focus:outline-none ${msg.role === "user" ? "text-white" : "text-gray-600"}`}
-                        title="Copy message"
+                        title="Salin pesan"
                       >
                         <FaCopy className="text-sm ml-2" />
                       </button>
@@ -905,7 +905,7 @@ export default function UmmahPartner() {
             <form onSubmit={handleGeneralChatSubmit} className="p-4 border-t border-gray-200 bg-white shadow-inner sticky bottom-0 z-10">
               <div className="flex items-center">
                 <textarea
-                  className="flex-1 p-3 border border-gray-300 rounded-xl resize-none focus:ring-[#F79319] focus:border-[#F79319] mr-3 text-base"
+                  className="flex-1 p-3 border border-gray-300 rounded-xl resize-none focus:ring-[#045394] focus:border-[#045394] mr-3 text-base"
                   rows="1"
                   placeholder="Ketik pesan Anda..."
                   value={inputMessage}
@@ -917,7 +917,7 @@ export default function UmmahPartner() {
                   }}
                   disabled={isTyping}
                 />
-                <button type="submit" className="bg-[#316B6C] text-white p-3 rounded-full hover:bg-[#2A5C5D] transition-colors duration-300 disabled:opacity-50 shadow-md" disabled={isTyping || !inputMessage.trim()}>
+                <button type="submit" className="bg-[#045394] text-white p-3 rounded-full hover:bg-blue-900 transition-colors duration-300 disabled:opacity-50 shadow-md" disabled={isTyping || !inputMessage.trim()}>
                   <FaPaperPlane className="text-lg" />
                 </button>
               </div>
@@ -928,11 +928,11 @@ export default function UmmahPartner() {
     } else if (currentMode === "quiz") {
       return (
         <div className="p-6 overflow-y-auto flex-1 bg-gray-50">
-          <div className="bg-white p-6 rounded-xl shadow-sm">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <h4 className="text-xl font-semibold mb-4">Hasil Kuis Anda:</h4>
             {isLoading ? (
               <div className="text-center text-gray-500 py-10">
-                <FaSpinner className="animate-spin text-4xl mx-auto mb-4 text-[#F79319]" />
+                <FaSpinner className="animate-spin text-4xl mx-auto mb-4 text-[#045394]" />
                 <p>Menciptakan kuis...</p>
               </div>
             ) : quizQuestions.length > 0 ? (
@@ -964,7 +964,7 @@ export default function UmmahPartner() {
               <div className="text-center text-gray-500 py-10">Tidak ada kuis yang dihasilkan.</div>
             )}
             {quizQuestions.length > 0 && (
-              <button onClick={handleDownloadQuizPdf} className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 mt-4 flex items-center justify-center shadow-md">
+              <button onClick={handleDownloadQuizPdf} className="w-full bg-[#049494] text-white py-3 rounded-xl font-semibold hover:bg-[#047171] mt-4 flex items-center justify-center shadow-md">
                 <FaDownload className="mr-2" /> Unduh Kuis sebagai PDF
               </button>
             )}
@@ -977,7 +977,7 @@ export default function UmmahPartner() {
           <h4 className="text-xl font-semibold mb-6">Flashcards Anda</h4>
           {isLoading ? (
             <div className="text-center text-gray-500 py-10">
-              <FaSpinner className="animate-spin text-4xl mx-auto mb-4 text-[#F79319]" />
+              <FaSpinner className="animate-spin text-4xl mx-auto mb-4 text-[#045394]" />
               <p>Menciptakan flashcards...</p>
             </div>
           ) : flashcards.length > 0 ? (
@@ -1005,17 +1005,17 @@ export default function UmmahPartner() {
     } else if (currentMode === "mindmap") {
       return (
         <div className="p-6 overflow-y-auto flex-1 bg-gray-50">
-          <div className="bg-white p-6 rounded-xl shadow-sm">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <h4 className="text-xl font-semibold mb-4">Mind Map Anda</h4>
             {isLoading ? (
               <div className="text-center text-gray-500 py-10">
-                <FaSpinner className="animate-spin text-4xl mx-auto mb-4 text-[#F79319]" />
+                <FaSpinner className="animate-spin text-4xl mx-auto mb-4 text-[#045394]" />
                 <p>Menciptakan mind map...</p>
               </div>
             ) : mindMapContent ? (
               <>
-                <div ref={mindMapSvgRef} className="bg-gray-100 p-4 rounded-lg overflow-x-auto text-gray-800 w-full flex items-center justify-center"></div>
-                <button onClick={handleDownloadMindMapPdf} className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 mt-4 flex items-center justify-center shadow-md">
+                <div ref={mindMapSvgRef} className="bg-gray-100 p-4 rounded-lg overflow-x-auto text-gray-800 w-full flex items-center justify-center border border-gray-200"></div>
+                <button onClick={handleDownloadMindMapPdf} className="w-full bg-[#049494] text-white py-3 rounded-xl font-semibold hover:bg-[#047171] mt-4 flex items-center justify-center shadow-md">
                   <FaDownload className="mr-2" /> Unduh Mind Map sebagai PDF
                 </button>
               </>
@@ -1028,7 +1028,7 @@ export default function UmmahPartner() {
     }
     return (
       <div className="p-6 flex-1 bg-gray-50 flex items-center justify-center">
-        <div className="text-center text-gray-500 p-8 bg-white rounded-xl shadow-sm">
+        <div className="text-center text-gray-500 p-8 bg-white rounded-xl shadow-sm border border-gray-200">
           <p className="text-xl mb-4">Halo, aku Ummah Partner AI!</p>
           <p className="text-sm">Pilih mode dari panel kiri untuk memulai.</p>
         </div>
@@ -1040,7 +1040,7 @@ export default function UmmahPartner() {
     <div className="flex flex-col md:flex-row h-screen bg-gray-100 font-inter text-gray-800">
       {/* Panel Kiri: Kontrol Fitur */}
       <div className="w-full md:w-1/3 lg:w-1/4 bg-white p-6 shadow-lg flex flex-col overflow-y-auto rounded-lg md:rounded-r-none">
-        <h2 className="text-2xl font-bold text-center text-[#F79319] mb-6">Ummah Partner</h2>
+        <h2 className="text-2xl font-bold text-center text-[#045394] mb-6">Ummah Partner</h2>
 
         {/* Tombol Navigasi Mode */}
         <div className="grid grid-cols-2 gap-3 mb-6 border-b pb-4 border-gray-200">
@@ -1052,7 +1052,7 @@ export default function UmmahPartner() {
               setMindMapContent("");
             }}
             className={`flex items-center justify-center px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${
-              currentMode === "chat" ? "bg-[#316B6C] text-white shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              currentMode === "chat" ? "bg-[#045394] text-white shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
             <FaRobot className="mr-2" /> Chat Umum
@@ -1065,7 +1065,7 @@ export default function UmmahPartner() {
               setMindMapContent("");
             }}
             className={`flex items-center justify-center px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${
-              currentMode === "askPdf" ? "bg-[#316B6C] text-white shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              currentMode === "askPdf" ? "bg-[#045394] text-white shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
             <FaFilePdf className="mr-2" /> Tanya PDF
@@ -1078,7 +1078,7 @@ export default function UmmahPartner() {
               setMindMapContent("");
             }}
             className={`flex items-center justify-center px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${
-              currentMode === "summarizePdf" ? "bg-[#316B6C] text-white shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              currentMode === "summarizePdf" ? "bg-[#045394] text-white shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
             <FaBookOpen className="mr-2" /> Ringkas PDF
@@ -1091,7 +1091,7 @@ export default function UmmahPartner() {
               setMindMapContent("");
             }}
             className={`flex items-center justify-center px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${
-              currentMode === "quiz" ? "bg-[#316B6C] text-white shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              currentMode === "quiz" ? "bg-[#045394] text-white shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
             <FaQuestionCircle className="mr-2" /> Buat Kuis
@@ -1104,7 +1104,7 @@ export default function UmmahPartner() {
               setMindMapContent("");
             }}
             className={`flex items-center justify-center px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${
-              currentMode === "flashcards" ? "bg-[#316B6C] text-white shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              currentMode === "flashcards" ? "bg-[#045394] text-white shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
             <FaLightbulb className="mr-2" /> Flashcards
@@ -1117,7 +1117,7 @@ export default function UmmahPartner() {
               setFlashcards([]);
             }}
             className={`flex items-center justify-center px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${
-              currentMode === "mindmap" ? "bg-[#316B6C] text-white shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              currentMode === "mindmap" ? "bg-[#045394] text-white shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
             <FaProjectDiagram className="mr-2" /> Mind Map
@@ -1125,7 +1125,7 @@ export default function UmmahPartner() {
         </div>
 
         {/* Tombol Buka Riwayat Percakapan */}
-        <button onClick={() => setShowHistoryModal(true)} className="w-full bg-[#F79319] text-white py-3 rounded-xl font-semibold hover:bg-[#E07B00] transition-colors duration-300 flex items-center justify-center shadow-md mb-6">
+        <button onClick={() => setShowHistoryModal(true)} className="w-full bg-[#045394] text-white py-3 rounded-xl font-semibold hover:bg-blue-900 transition-colors duration-300 flex items-center justify-center shadow-md mb-6">
           <FaHistory className="mr-2" /> Lihat Riwayat Percakapan
         </button>
 
@@ -1146,7 +1146,7 @@ export default function UmmahPartner() {
                     setUploadedPdfFileName("");
                     setPdfTextContent("");
                   }}
-                  className="form-radio h-5 w-5 text-[#F79319] focus:ring-[#F79319]"
+                  className="form-radio h-5 w-5 text-[#045394] focus:ring-[#045394]"
                 />
                 <span className="ml-2 text-gray-700 text-sm">Dari Database</span>
               </label>
@@ -1162,7 +1162,7 @@ export default function UmmahPartner() {
                     setSearchMateriQuery("");
                     setPdfTextContent("");
                   }}
-                  className="form-radio h-5 w-5 text-[#F79319] focus:ring-[#F79319]"
+                  className="form-radio h-5 w-5 text-[#045394] focus:ring-[#045394]"
                 />
                 <span className="ml-2 text-gray-700 text-sm">Upload Baru</span>
               </label>
@@ -1182,7 +1182,7 @@ export default function UmmahPartner() {
                       setSelectedDatabaseMateriId("");
                     }}
                     onFocus={() => setShowSearchDropdown(true)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-[#F79319] focus:border-[#F79319]"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-[#045394] focus:border-[#045394]"
                   />
                   <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 </div>
@@ -1205,7 +1205,7 @@ export default function UmmahPartner() {
                 )}
                 {showSearchDropdown && searchMateriQuery.length > 0 && filteredDatabaseMateris.length === 0 && <p className="text-sm text-gray-500 mt-2">Tidak ada materi yang cocok.</p>}
                 {selectedDatabaseMateriId && (
-                  <p className="text-sm text-[#F79319] mt-2">
+                  <p className="text-sm text-[#045394] mt-2">
                     Materi terpilih: <span className="font-semibold">{materis.find((m) => m._id === selectedDatabaseMateriId)?.judulMateri}</span>
                   </p>
                 )}
@@ -1224,9 +1224,9 @@ export default function UmmahPartner() {
                     setUploadedPdfFileName(file ? file.name : "");
                     setPdfTextContent("");
                   }}
-                  className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-[#F79319] focus:border-[#F79319]"
+                  className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-[#045394] focus:border-[#045394]"
                 />
-                {uploadedPdfFileName && <p className="text-sm text-[#F79319] mt-2">File terpilih: {uploadedPdfFileName}</p>}
+                {uploadedPdfFileName && <p className="text-sm text-[#045394] mt-2">File terpilih: {uploadedPdfFileName}</p>}
               </div>
             )}
 
@@ -1252,7 +1252,7 @@ export default function UmmahPartner() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-800">Tanya tentang PDF</h3>
             <textarea
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-[#F79319] focus:border-[#F79319] resize-none"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-[#045394] focus:border-[#045394] resize-none"
               rows="4"
               placeholder="Ajukan pertanyaan Anda tentang materi PDF yang dipilih..."
               value={askPdfQuestion}
@@ -1261,7 +1261,7 @@ export default function UmmahPartner() {
             ></textarea>
             <button
               onClick={handleAskPdfSubmit}
-              className="w-full bg-[#316B6C] text-white py-3 rounded-xl font-semibold hover:bg-[#2A5C5D] transition-colors duration-300 disabled:opacity-50 shadow-md"
+              className="w-full bg-[#045394] text-white py-3 rounded-xl font-semibold hover:bg-blue-900 transition-colors duration-300 disabled:opacity-50 shadow-md"
               disabled={isTyping || isPdfProcessing || !pdfTextContent.trim() || !askPdfQuestion.trim()}
             >
               Tanya AI
@@ -1275,7 +1275,7 @@ export default function UmmahPartner() {
             <p className="text-sm text-gray-600">Klik tombol di bawah untuk mendapatkan ringkasan poin-poin penting dari materi PDF yang dipilih.</p>
             <button
               onClick={handleSummarizePdf}
-              className="w-full bg-[#316B6C] text-white py-3 rounded-xl font-semibold hover:bg-[#2A5C5D] transition-colors duration-300 disabled:opacity-50 shadow-md"
+              className="w-full bg-[#045394] text-white py-3 rounded-xl font-semibold hover:bg-blue-900 transition-colors duration-300 disabled:opacity-50 shadow-md"
               disabled={isTyping || isPdfProcessing || !pdfTextContent.trim()}
             >
               Ringkas PDF
@@ -1296,7 +1296,7 @@ export default function UmmahPartner() {
                     value="multipleChoice"
                     checked={quizType === "multipleChoice"}
                     onChange={(e) => setQuizType(e.target.value)}
-                    className="form-radio h-5 w-5 text-[#F79319] focus:ring-[#F79319]"
+                    className="form-radio h-5 w-5 text-[#045394] focus:ring-[#045394]"
                     disabled={isPdfProcessing || !pdfTextContent.trim()}
                   />
                   <span className="ml-2 text-gray-700 text-sm">Pilihan Ganda</span>
@@ -1308,7 +1308,7 @@ export default function UmmahPartner() {
                     value="fillInTheBlank"
                     checked={quizType === "fillInTheBlank"}
                     onChange={(e) => setQuizType(e.target.value)}
-                    className="form-radio h-5 w-5 text-[#F79319] focus:ring-[#F79319]"
+                    className="form-radio h-5 w-5 text-[#045394] focus:ring-[#045394]"
                     disabled={isPdfProcessing || !pdfTextContent.trim()}
                   />
                   <span className="ml-2 text-gray-700 text-sm">Isian Singkat</span>
@@ -1320,7 +1320,7 @@ export default function UmmahPartner() {
               <select
                 value={numQuestions}
                 onChange={(e) => setNumQuestions(Number(e.target.value))}
-                className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-[#F79319] focus:border-[#F79319]"
+                className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-[#045394] focus:border-[#045394]"
                 disabled={isPdfProcessing || !pdfTextContent.trim()}
               >
                 {[3, 5, 10, 15].map((num) => (
@@ -1332,7 +1332,7 @@ export default function UmmahPartner() {
             </div>
             <button
               onClick={handleGenerateQuiz}
-              className="w-full bg-[#316B6C] text-white py-3 rounded-xl font-semibold hover:bg-[#2A5C5D] transition-colors duration-300 disabled:opacity-50 shadow-md"
+              className="w-full bg-[#045394] text-white py-3 rounded-xl font-semibold hover:bg-blue-900 transition-colors duration-300 disabled:opacity-50 shadow-md"
               disabled={isLoading || isPdfProcessing || !pdfTextContent.trim()}
             >
               Generate Kuis
@@ -1346,7 +1346,7 @@ export default function UmmahPartner() {
             <p className="text-sm text-gray-600">Klik tombol di bawah untuk membuat flashcards dari materi PDF yang dipilih.</p>
             <button
               onClick={handleGenerateFlashcards}
-              className="w-full bg-[#316B6C] text-white py-3 rounded-xl font-semibold hover:bg-[#2A5C5D] transition-colors duration-300 disabled:opacity-50 shadow-md"
+              className="w-full bg-[#045394] text-white py-3 rounded-xl font-semibold hover:bg-blue-900 transition-colors duration-300 disabled:opacity-50 shadow-md"
               disabled={isLoading || isPdfProcessing || !pdfTextContent.trim()}
             >
               Generate Flashcards
@@ -1360,7 +1360,7 @@ export default function UmmahPartner() {
             <p className="text-sm text-gray-600">Klik tombol di bawah untuk membuat mind map dari materi PDF yang dipilih.</p>
             <button
               onClick={handleGenerateMindMap}
-              className="w-full bg-[#316B6C] text-white py-3 rounded-xl font-semibold hover:bg-[#2A5C5D] transition-colors duration-300 disabled:opacity-50 shadow-md"
+              className="w-full bg-[#045394] text-white py-3 rounded-xl font-semibold hover:bg-blue-900 transition-colors duration-300 disabled:opacity-50 shadow-md"
               disabled={isLoading || isPdfProcessing || !pdfTextContent.trim()}
             >
               Generate Mind Map
@@ -1370,8 +1370,8 @@ export default function UmmahPartner() {
       </div>
 
       {/* Header: Area Chat, Kuis, Flashcards, Mind Map */}
-      <div className="flex-1 flex flex-col h-screen  bg-white shadow-lg md:ml-4 rounded-lg md:rounded-l-none">
-        <div className="p-4 bg-[#316B6C] text-white text-center text-xl font-semibold shadow-md sticky top-0 z-10">
+      <div className="flex-1 flex flex-col h-screen bg-white shadow-lg md:ml-4 rounded-lg md:rounded-l-none">
+        <div className="p-4 bg-[#045394] text-white text-center text-xl font-semibold shadow-md sticky top-0 z-10 rounded-t-lg md:rounded-tl-none">
           {currentMode === "chat" ? "Obrolan dengan Ummah Partner AI" : currentMode === "quiz" ? "Hasil Kuis" : currentMode === "flashcards" ? "Hasil Flashcards" : currentMode === "mindmap" ? "Mind Map" : "Ummah Partner AI"}
         </div>
 
@@ -1381,14 +1381,14 @@ export default function UmmahPartner() {
       {showHistoryModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col">
-            <div className="p-5 border-b border-gray-200 flex justify-between items-center bg-[#316B6C] rounded-t-xl">
+            <div className="p-5 border-b border-gray-200 flex justify-between items-center bg-[#045394] rounded-t-xl">
               <h3 className="text-xl font-semibold text-white">Riwayat Percakapan</h3>
               <button onClick={() => setShowHistoryModal(false)} className="text-white hover:text-gray-200">
                 <FaTimes className="text-2xl" />
               </button>
             </div>
             <div className="p-5 flex-1 overflow-y-auto">
-              <button onClick={startNewChat} className="w-full bg-[#F79319] text-white py-2 rounded-lg font-semibold hover:bg-[#E07B00] transition-colors duration-300 flex items-center justify-center shadow-md mb-4">
+              <button onClick={startNewChat} className="w-full bg-[#045394] text-white py-2 rounded-lg font-semibold hover:bg-blue-900 transition-colors duration-300 flex items-center justify-center shadow-md mb-4">
                 <FaPlus className="mr-2" /> Mulai Chat Baru
               </button>
               {isHistoryLoading ? (
@@ -1403,7 +1403,7 @@ export default function UmmahPartner() {
                     <li
                       key={session._id}
                       className={`flex items-center justify-between p-3 rounded-lg transition-all duration-200 ${
-                        currentChatSessionId === session._id ? "bg-[#E0F2F2] text-[#316B6C] font-semibold shadow-inner" : "bg-gray-100 hover:bg-gray-200 cursor-pointer"
+                        currentChatSessionId === session._id ? "bg-blue-100 text-[#045394] font-semibold shadow-inner" : "bg-gray-100 hover:bg-gray-200 cursor-pointer"
                       }`}
                       onClick={() => {
                         if (editingSessionId !== session._id) {
@@ -1427,7 +1427,7 @@ export default function UmmahPartner() {
                               }
                             }}
                             autoFocus
-                            className="flex-1 p-1 border border-gray-300 rounded-md text-sm focus:ring-[#F79319] focus:border-[#F79319]"
+                            className="flex-1 p-1 border border-gray-300 rounded-md text-sm focus:ring-[#045394] focus:border-[#045394]"
                           />
                           <button
                             type="button"

@@ -1,8 +1,6 @@
 import { React, useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { UserContextProvider } from "./context/UserContext";
-
-import Beranda from "./pages/Beranda";
 import Daftar from "./pages/Daftar";
 import Masuk from "./pages/Masuk";
 import LihatDonasi from "./pages/LihatDonasi";
@@ -28,6 +26,7 @@ import UmmahBook from "./pages/UmmahBook";
 import UmmahPartner from "./pages/UmmahPatner";
 import BookDetail from "./pages/BookDetail";
 import AdminDashboard from "./pages/AdminDashboard";
+import { Beranda } from "./pages/Beranda";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -65,14 +64,11 @@ function NavbarWrapper() {
 }
 
 function App() {
-  const location = useLocation();
-  const hideMaskotOnPaths = ["/daftar", "/masuk", "/ummah-partner"];
-  const shouldHideMaskot = hideMaskotOnPaths.includes(location.pathname);
   return (
     <>
       <NavbarWrapper />
       <ScrollToTop />
-      {!shouldHideMaskot && <FloatingMaskot />}
+
       <Routes>
         <Route path="/" element={<Beranda />} />
         <Route path="/ummah-book" element={<UmmahBook />} />
