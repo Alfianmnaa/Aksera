@@ -12,7 +12,7 @@ import CardDonasi from "../components/LihatDonasi/CardDonasi";
 
 export default function DonasiSaya() {
   const [donations, setDonations] = useState([]);
-  const [filter, setFilter] = useState("Terbaru");
+  const [filter, setFilter] = useState("Semua");
   const [activeTab, setActiveTab] = useState("donasi");
   const [loading, setLoading] = useState(false);
 
@@ -65,9 +65,8 @@ export default function DonasiSaya() {
 
         const hasilValid = dataGabungan.filter(Boolean);
 
-        const sorted = hasilValid.sort((a, b) => (filter === "Terlama" ? a.createdAt - b.createdAt : b.createdAt - a.createdAt));
-
-        setDonations(sorted);
+        const filtered = hasilValid.sort((a, b) => b.createdAt - a.createdAt);
+        setDonations(filtered);
       } catch (err) {
         console.error("Gagal ambil data donasi saya:", err);
       } finally {
@@ -90,10 +89,14 @@ export default function DonasiSaya() {
 
         {activeTab === "donasi" ? (
           <>
-            <FilterSection filter={filter} handleFilterChange={handleFilterChange} itemCount={donations.length} />
-            <div className="flex gap-4 flex-wrap justify-center">
+            <FilterSection 
+              filter={filter} 
+              handleFilterChange={handleFilterChange} 
+              itemCount={donations.filter(item => item.status === "tersedia").length} 
+            />
+            <div className="flex gap-4 flex-wrap justify-start">
               {loading && (
-                <div className="flex flex-wrap justify-center gap-4">
+                <div className="flex flex-wrap justify-start gap-4">
                   {Array(6)
                     .fill(null)
                     .map((_, idx) => (
@@ -103,9 +106,11 @@ export default function DonasiSaya() {
               )}
 
               {!loading && donations.length === 0 && <p>Tidak ada donasi ditemukan.</p>}
-              {donations?.map((item) => (
-                <CardDonasiSaya key={item.id} {...item} />
-              ))}
+              {donations
+                ?.filter(item => filter === "Semua" ? true : item.status === filter)
+                ?.map((item) => (
+                  <CardDonasiSaya key={item.id} {...item} />
+                ))}
             </div>
           </>
         ) : (
@@ -167,9 +172,9 @@ export function Profil() {
             )}
           </div>
         </div>
-        <button className="border hidden md:block self-end h-fit rounded-full text-sm" onClick={handleClick}>
+        {/* <button className="border hidden md:block self-end h-fit rounded-full text-sm" onClick={handleClick}>
           <img src={editProfilButton} alt="Edit Profil" className="w-32" />
-        </button>
+        </button> */}
       </div>
     </>
   );
@@ -177,34 +182,126 @@ export function Profil() {
 
 function TabSelector({ activeTab, setActiveTab }) {
   return (
-    <div className="flex  px-6 mb-8 font-medium">
-      <button className={`px-5 border-b-2 md:text-md text-sm border-0 bg-transparent rounded-none pb-2 ${activeTab === "donasi" ? "text-primary border-primary" : "text-gray-500"}`} onClick={() => setActiveTab("donasi")}>
-        Donasi Saya
-      </button>
-      <button className={`px-5 border-b-2 md:text-md text-sm border-0 bg-transparent rounded-none pb-2 ${activeTab === "disimpan" ? "text-primary border-primary" : "text-gray-500"}`} onClick={() => setActiveTab("disimpan")}>
-        Disimpan
-      </button>
+    <div className="px-6 mt-4 mb-12">
+      <div className="flex bg-gray-100 rounded-lg p-1 relative max-w-md">
+        <div
+          className={`absolute top-1 bottom-1 transition-transform duration-300 ease-in-out transform ${
+            activeTab === "donasi" ? "translate-x-1" : "translate-x-full"
+          } w-[calc(50%-2px)] bg-white rounded-md shadow-md left-[0px]`}
+        />
+        <button
+          onClick={() => setActiveTab("donasi")}
+          className={`flex-1 py-2 px-4 rounded-md md:text-sm text-xs font-medium transition-all duration-300 relative z-10 flex items-center justify-center gap-2 ${
+            activeTab === "donasi" 
+              ? "text-primary transform scale-105" 
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+            <path d="M14 3v5h5M16 13H8M16 17H8M10 9H8"/>
+          </svg>
+          Donasi Saya
+        </button>
+        <button
+          onClick={() => setActiveTab("disimpan")}
+          className={`flex-1 py-2 px-4 rounded-md md:text-sm text-xs font-medium transition-all duration-300 relative z-10 flex items-center justify-center gap-2 ${
+            activeTab === "disimpan" 
+              ? "text-primary transform scale-105" 
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
+          </svg>
+          Disimpan
+        </button>
+      </div>
     </div>
   );
 }
 
 function FilterSection({ filter, handleFilterChange, itemCount }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const pendingDonations = itemCount || 0;
+
+  const filterOptions = [
+    { value: 'Semua', icon: 'list', label: 'Semua' },
+    { value: 'tersedia', icon: 'clock', label: 'Menunggu' },
+    { value: 'disalurkan', icon: 'check', label: 'Disalurkan' }
+  ];
+
+  const handleOptionClick = (value) => {
+    handleFilterChange({ target: { value } });
+    setIsOpen(false);
+  };
+
   return (
-    <div className="flex px-6 justify-between items-center mt-4 mb-4 md:mb-8">
-      <div className="flex items-center gap-2">
-        <label htmlFor="filter" className="text-sm">
-          Urutkan:
-        </label>
-        <select id="filter" value={filter} onChange={handleFilterChange} className="border rounded px-2 py-1 text-sm">
-          <option value="Terbaru">Terbaru</option>
-          <option value="Terlama">Terlama</option>
-        </select>
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full px-3 sm:px-6 mb-6 gap-4 sm:gap-0">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Donasi Saya</h2>
+        {pendingDonations > 0 && (
+          <div className="flex items-center gap-2 bg-yellow-50 px-3 py-1 rounded-full self-start">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-yellow-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+            <span className="text-sm text-yellow-800">{pendingDonations} menunggu</span>
+          </div>
+        )}
       </div>
-      <div className="font-semibold px-8 text-center">
-        Total Donasi
-        <p className="text-sm">
-          <span className="text-blue-700 text-2xl px-1">{itemCount}</span> Barang
-        </p>
+      
+      <div className="relative w-full sm:w-auto">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-2 bg-white shadow-sm w-full sm:w-auto
+            hover:border-gray-400 transition-all duration-200 cursor-pointer min-w-[160px]
+            focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+          <span className="flex-1 text-center text-sm">{filterOptions.find(opt => opt.value === filter)?.label || filter}</span>
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+          >
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </button>
+
+        {isOpen && (
+          <>
+            <div 
+              className="fixed inset-0 bg-transparent" 
+              onClick={() => setIsOpen(false)}
+            />
+            <div className="absolute right-0 mt-1 w-full min-w-[160px] bg-white rounded-md shadow-lg border border-gray-200 py-1 z-50">
+              {filterOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => handleOptionClick(option.value)}
+                  className={`w-full px-3 py-2 text-sm text-left hover:bg-gray-50 flex items-center gap-2
+                    ${filter === option.value ? 'text-primary bg-primary/5 font-medium' : 'text-gray-700'}
+                    transition-colors duration-150`}
+                >
+                  {filter === option.value && (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  )}
+                  <span className={filter === option.value ? 'ml-0' : 'ml-6'}>{option.label}</span>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -237,7 +334,13 @@ function CardDonasiSaya({ id, title, kategoriBarang, jenisBarang, status, jumlah
   };
   return (
     <div onClick={handleClick} className="rounded-[28px] shadow-[0px_0px_3px_1px_rgba(0,0,0,0.15)] border-1 p-4 w-full max-w-xs bg-white flex flex-col cursor-pointer hover:shadow-[0px_0px_10px_2px_rgba(0,0,0,0.15)] transition">
-      <span className="bg-blue-100 w-fit self-end mb-2 -mt-2 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full">{jumlahRequest} Permintaan</span>
+      <span className={`w-fit self-end mb-2 -mt-2 text-xs font-semibold px-3 py-1 rounded-full ${
+        status === 'tersedia' 
+          ? 'bg-yellow-100 text-yellow-800'
+          : 'bg-green-100 text-green-800'
+      }`}>
+        {status === 'tersedia' ? 'Menunggu' : 'Disalurkan'}
+      </span>
       <div className="h-36 bg-gray-200 rounded-lg mb-4 overflow-hidden">
         <img src={imageSrc} alt="donasi" className="object-cover w-full h-full" />
       </div>

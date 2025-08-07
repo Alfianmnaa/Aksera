@@ -292,8 +292,10 @@ function AjukanPermohonan({ detilDonasi, userId, donasiId }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     if (!tujuan.trim()) {
+      setIsSubmitting(false);
       return Swal.fire("Gagal", "Tujuan permohonan tidak boleh kosong.", "warning");
     }
 
@@ -303,10 +305,12 @@ function AjukanPermohonan({ detilDonasi, userId, donasiId }) {
         tujuanPermohonan: tujuan,
       });
 
-      Swal.fire("Berhasil!", "Permohonan Anda telah dikirim.", "success");
+      await Swal.fire("Berhasil!", "Permohonan Anda telah dikirim.", "success");
       setSudahMengajukan(true);
     } catch (err) {
       Swal.fire("Gagal", err?.response?.data || "Terjadi kesalahan.", "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -318,20 +322,48 @@ function AjukanPermohonan({ detilDonasi, userId, donasiId }) {
     );
   }
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   return (
     <div className="mt-6">
-      <form onSubmit={handleSubmit} className="w-full md:w-1/2">
-        <label className="block font-bold text-lg mb-2">Permohonan Donasi</label>
-        <textarea
-          placeholder="Tuliskan alasan atau kebutuhan permohonan Anda"
-          value={tujuan}
-          onChange={(e) => setTujuan(e.target.value)}
-          className="w-full block border border-gray-300 rounded-md px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <div className="flex justify-end">
-          <button type="submit" className="bg-primary hover:bg-primary-700 text-white font-medium px-6 py-2 rounded-full shadow-md transition">
-            Kirim
-          </button>
+      <form onSubmit={handleSubmit} className="w-full md:w-1/2 bg-white rounded-lg border shadow-sm">
+        <div className="p-6 space-y-4">
+          <div>
+            <label htmlFor="request-message" className="text-base font-semibold text-gray-900 block">
+              Ajukan Permohonan Donasi
+            </label>
+          </div>
+
+          <textarea
+            id="request-message"
+            placeholder="Tuliskan Alasan atau Kebutuhan permohonan anda."
+            value={tujuan}
+            onChange={(e) => setTujuan(e.target.value)}
+            className="w-full min-h-[120px] resize-none block border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-gray-50"
+            disabled={isSubmitting}
+          />
+
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={!tujuan.trim() || isSubmitting}
+              className="bg-primary hover:bg-primary/80 disabled:bg-gray-400 text-white font-medium px-6 py-2 rounded-full shadow-md transition flex items-center gap-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Mengirim...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                  <span>Kirim Permohonan</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </form>
     </div>

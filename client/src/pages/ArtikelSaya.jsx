@@ -5,6 +5,7 @@ import { UserContext } from "../context/UserContext";
 import TambahArtikel from "../components/ArtikelSaya/TambahArtikel";
 import komunitasSampul from "../assets/DonasiSaya/komunitasSampul.png";
 import personProfile from "../assets/Navbar/personProfile.png";
+import { CardSkleton } from "../components/LihatDonasi/CardSkleton";
 
 import CardArtikel from "../components/Artikel/CardArtikel";
 
@@ -15,12 +16,14 @@ export default function ArtikelSaya() {
   const [filter, setFilter] = useState("Terbaru");
   const [detilUser, setDetilUser] = useState();
   const [activeTab, setActiveTab] = useState("artikel-saya");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
 
     const fetchArticles = async () => {
       try {
+        setLoading(true);
         const res = await axiosInstance.get("/artikel/getall");
         const allArticles = res.data || [];
 
@@ -31,6 +34,8 @@ export default function ArtikelSaya() {
         setArticles(sortedArticles);
       } catch (err) {
         console.error("Gagal mengambil artikel:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -64,25 +69,45 @@ export default function ArtikelSaya() {
         {activeTab === "artikel-saya" ? (
           <>
             <FilterSection filter={filter} handleFilterChange={handleFilterChange} itemCount={articles.length} />
-            <div className="flex px-6 gap-4 flex-wrap justify-center">
-              {articles.map((item) => (
-                <CardArtikel
-                  key={item._id}
-                  id={item._id}
-                  title={item.judulArtikel}
-                  description={item.deskArtikel}
-                  imageSrc={item.coverUrl}
-                  date={new Date(item.createdAt).toLocaleDateString("id-ID", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                  author={detilUser?.namaLengkap}
-                  username={`@${user?.username}`}
-                  avatarSrc={detilUser?.fotoProfil}
-                  handleClick={() => handleClick(item._id)}
-                />
-              ))}
+            <div className="px-6">
+              {loading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {Array(6)
+                    .fill(null)
+                    .map((_, idx) => (
+                      <CardSkleton key={idx} />
+                    ))}
+                </div>
+              ) : articles.length === 0 ? (
+                <div className="text-center py-8">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-16 h-16 text-gray-400 mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                  </svg>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Belum ada artikel</h3>
+                  <p className="text-gray-600">Mulai menulis artikel pertama Anda</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {articles.map((item) => (
+                    <CardArtikel
+                      key={item._id}
+                      id={item._id}
+                      title={item.judulArtikel}
+                      description={item.deskArtikel}
+                      imageSrc={item.coverUrl}
+                      date={new Date(item.createdAt).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                      author={detilUser?.namaLengkap}
+                      username={`@${user?.username}`}
+                      avatarSrc={detilUser?.fotoProfil}
+                      handleClick={() => handleClick(item._id)}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </>
         ) : (
@@ -149,28 +174,108 @@ export function Profil() {
 }
 function TabSelector({ activeTab, setActiveTab }) {
   return (
-    <div className="flex px-6 mt-4 font-medium">
-      <button className={`px-5 border-b-2 border-0 bg-transparent rounded-none pb-2 ${activeTab === "artikel-saya" ? "text-primary border-primary" : "text-gray-500"}`} onClick={() => setActiveTab("artikel-saya")}>
-        Artikel Saya
-      </button>
-      <button className={`px-5 border-b-2 border-0 bg-transparent rounded-none pb-2 ${activeTab === "tambah-artikel" ? "text-primary border-primary" : "text-gray-500"}`} onClick={() => setActiveTab("tambah-artikel")}>
-        Tambah Artikel
-      </button>
+    <div className="px-6 mt-4 mb-12">
+      <div className="flex bg-gray-100 rounded-lg p-1 relative max-w-md">
+        <div
+          className={`absolute top-1 bottom-1 transition-transform duration-300 ease-in-out transform ${
+            activeTab === "artikel-saya" ? "translate-x-1" : "translate-x-full"
+          } w-[calc(50%-2px)] bg-white rounded-md shadow-md left-[0px]`}
+        />
+        <button
+          onClick={() => setActiveTab("artikel-saya")}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-300 relative z-10 flex items-center justify-center gap-2 ${
+            activeTab === "artikel-saya" 
+              ? "text-primary transform scale-105" 
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>
+          </svg>
+          Artikel Saya
+        </button>
+        <button
+          onClick={() => setActiveTab("tambah-artikel")}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-300 relative z-10 flex items-center justify-center gap-2 ${
+            activeTab === "tambah-artikel" 
+              ? "text-primary transform scale-105" 
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 5v14M5 12h14"></path>
+          </svg>
+          Tambah Artikel
+        </button>
+      </div>
     </div>
   );
 }
 
-function FilterSection({ filter, handleFilterChange, itemCount }) {
+function FilterSection({ filter, handleFilterChange }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleOptionClick = (value) => {
+    handleFilterChange({ target: { value } });
+    setIsOpen(false);
+  };
+
   return (
-    <div className="px-6 flex justify-between items-center mt-4 mb-8  ">
-      <div className="flex items-center gap-2">
-        <label htmlFor="filter" className="text-sm">
-          Urutkan:
-        </label>
-        <select id="filter" value={filter} onChange={handleFilterChange} className="border rounded px-2 py-1 text-sm">
-          <option value="Terbaru">Terbaru</option>
-          <option value="Terlama">Terlama</option>
-        </select>
+    <div className="flex items-center justify-between w-full px-6 mb-6">
+      <h2 className="text-xl md:text-2xl font-bold text-gray-900">Artikel Saya</h2>
+      <div className="relative">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-2 bg-white shadow-sm
+            hover:border-gray-400 transition-all duration-200 cursor-pointer min-w-[160px]
+            focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+          <span className="flex-1 text-center text-sm">{filter}</span>
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+          >
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </button>
+
+        {isOpen && (
+          <>
+            <div 
+              className="fixed inset-0 bg-transparent" 
+              onClick={() => setIsOpen(false)}
+            />
+            <div className="absolute right-0 mt-1 w-full min-w-[160px] bg-white rounded-md shadow-lg border border-gray-200 py-1 z-50
+              animate-in fade-in duration-200 slide-in-from-top-1"
+            >
+              {['Terbaru', 'Terlama', 'Populer'].map((option) => (
+                <button
+                  key={option}
+                  onClick={() => handleOptionClick(option)}
+                  className={`w-full px-3 py-2 text-sm text-left hover:bg-gray-50 flex items-center gap-2
+                    ${filter === option ? 'text-primary bg-primary/5 font-medium' : 'text-gray-700'}
+                    transition-colors duration-150`}
+                >
+                  {filter === option && (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  )}
+                  <span className={filter === option ? 'ml-0' : 'ml-6'}>{option}</span>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

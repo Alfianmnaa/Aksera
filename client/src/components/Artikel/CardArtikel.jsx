@@ -1,57 +1,145 @@
-import React from "react";
-import { useLocation } from "react-router-dom";
-import shareIcon from "../../assets/CardDonasi/share.png"; // Sesuaikan path jika beda
-import { FaCheckCircle } from "react-icons/fa"; // Tambahkan ini untuk icon verified
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { Share2, Copy, Facebook, Twitter, MessageCircle } from "lucide-react";
 
-export default function CardArtikel({ id, title, description, imageSrc, author, date, username, avatarSrc, handleClick }) {
+export default function CardArtikel({ 
+  id, 
+  title, 
+  description, 
+  imageSrc, 
+  date, 
+  username, 
+  avatarSrc, 
+  handleClick 
+}) {
+  const [showShareMenu, setShowShareMenu] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
   const isLongText = description?.length > 100;
   const displayText = isLongText ? description.slice(0, 100) + "..." : description;
 
-  const handleShare = (e) => {
-    e.stopPropagation();
+  const handleShare = async (platform) => {
+    const url = window.location.href + '/' + id;
+    const text = title;
 
-    const baseUrl = window.location.href;
-    const urlToShare = `${baseUrl}/${id}`;
-    if (navigator.share) {
-      navigator
-        .share({
-          url: urlToShare,
-        })
-
-        .catch((error) => console.error("Error berbagi:", error));
-    } else {
-      alert("Fungsi share tidak didukung di browser ini.");
+    switch (platform) {
+      case "copy":
+        try {
+          await navigator.clipboard.writeText(url);
+          setCopySuccess(true);
+          setTimeout(() => setCopySuccess(false), 2000);
+        } catch (err) {
+          console.error("Failed to copy: ", err);
+        }
+        break;
+      case "facebook":
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, "_blank");
+        break;
+      case "twitter":
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, "_blank");
+        break;
+      case "whatsapp":
+        window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`, "_blank");
+        break;
     }
+    setShowShareMenu(false);
   };
 
   return (
-    <div onClick={handleClick} className="rounded-[28px] shadow-[0px_0px_3px_1px_rgba(0,0,0,0.15)] border-1 p-4 w-full max-w-xs bg-white flex flex-col cursor-pointer hover:shadow-[0px_0px_10px_2px_rgba(0,0,0,0.15)] transition">
-      <div className="h-36 bg-gray-200 rounded-xl mb-4 overflow-hidden">
-        <img src={imageSrc || ""} alt="artikel" className="object-cover w-full h-full" />
+    <div onClick={handleClick} className="w-full max-w-sm bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+      <div className="relative">
+        <div className="w-full h-48 bg-gray-200 overflow-hidden">
+          <img src={imageSrc || ""} alt={title} className="w-full h-full object-cover" />
+        </div>
+
+        {/* Share Button */}
+        <div className="absolute top-3 right-3">
+          <div className="relative">
+            <button
+              className="bg-white/90 hover:bg-white shadow-sm p-2 rounded-md"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowShareMenu(!showShareMenu);
+              }}
+            >
+              <Share2 className="w-4 h-4" />
+            </button>
+
+            {showShareMenu && (
+              <div className="absolute top-full right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 p-2 z-10 min-w-[160px]">
+                <div className="flex flex-col space-y-1">
+                  <button
+                    className="flex items-center px-3 py-2 text-sm hover:bg-gray-100 rounded-md w-full"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleShare("copy");
+                    }}
+                  >
+                    <Copy className="w-4 h-4 mr-2" />
+                    {copySuccess ? "Tersalin!" : "Salin Link"}
+                  </button>
+                  <button
+                    className="flex items-center px-3 py-2 text-sm hover:bg-gray-100 rounded-md w-full"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleShare("facebook");
+                    }}
+                  >
+                    <Facebook className="w-4 h-4 mr-2" />
+                    Facebook
+                  </button>
+                  <button
+                    className="flex items-center px-3 py-2 text-sm hover:bg-gray-100 rounded-md w-full"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleShare("twitter");
+                    }}
+                  >
+                    <Twitter className="w-4 h-4 mr-2" />
+                    Twitter
+                  </button>
+                  <button
+                    className="flex items-center px-3 py-2 text-sm hover:bg-gray-100 rounded-md w-full"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleShare("whatsapp");
+                    }}
+                  >
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    WhatsApp
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      <div className="flex flex-col flex-1">
-        <div className="flex justify-between">
-          <div className="font-extrabold text-base">{title}</div>
+      <div className="p-4">
+        {/* Organization and Date */}
+        <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center">
+            <img src={avatarSrc || "https://via.placeholder.com/40"} alt="author" className="w-6 h-6 rounded-full object-cover mr-2" />
+            <span className="text-sm text-gray-600">{username}</span>
+          </div>
+          <span className="text-sm text-gray-400 ml-auto">{date}</span>
         </div>
-        <div className="text-xs text-gray-400 mt-1 self-end">{date}</div>
 
-        <p className="text-sm text-gray-700 mt-2">
-          {displayText}
-          {isLongText && <span className="text-primary-light ml-2">(Baca Selengkapnya)</span>}
-        </p>
-      </div>
+        {/* Title */}
+        <h3 className="text-lg font-semibold text-gray-900 mb-3 leading-tight">{title}</h3>
 
-      <div className="flex items-center justify-between mt-4">
-        <div className="flex items-center">
-          <img src={avatarSrc || "https://via.placeholder.com/40"} alt="author" className="w-8 h-8 rounded-full object-cover mr-2" />
+        {/* Description */}
+        <p className="text-gray-600 text-sm mb-4 leading-relaxed">{displayText}</p>
 
-          <div className="text-xs text-gray-500">{username}</div>
-        </div>
-        <div className="flex space-x-2">
-          <button onClick={handleShare} className="p-1 rounded-full hover:bg-gray-100" aria-label="Bagikan">
-            <img src={shareIcon} alt="Bagikan" className="w-5 h-5" />
-          </button>
+        {/* Read More Link */}
+        <div className="flex justify-end">
+          <Link
+            to={`/artikel/${id}`}
+            onClick={(e) => e.stopPropagation()}
+            className="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center gap-1"
+          >
+            Baca selengkapnya
+            <span>→</span>
+          </Link>
         </div>
       </div>
     </div>

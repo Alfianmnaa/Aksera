@@ -49,11 +49,11 @@ export default function ListArtikel() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-2 py-8 sm:py-12  ">
-      <h2 className="text-xl sm:text-2xl font-bold mb-4">Daftar Artikel Komunitas</h2>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      <h2 className="text-xl sm:text-2xl font-bold mb-6">Daftar Artikel Komunitas</h2>
 
       {loading ? (
-        <div className="flex flex-wrap  gap-4 justify-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
           {Array(6)
             .fill(null)
             .map((_, idx) => (
@@ -61,7 +61,7 @@ export default function ListArtikel() {
             ))}
         </div>
       ) : (
-        <div className="flex gap-6 flex-wrap justify-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
           {artikelList.map((item) => (
             <CardArtikel
               key={item._id}
