@@ -60,7 +60,7 @@ const Flashcard = ({ question, answer }) => {
   );
 };
 
-export default function UmmahPartner() {
+export default function SeraAi() {
   const { user } = useContext(UserContext);
   const chatContainerRef = useRef(null);
   const searchDropdownRef = useRef(null);
@@ -469,7 +469,7 @@ export default function UmmahPartner() {
       Swal.fire({
         icon: "info",
         title: "Anda Belum Login",
-        text: "Silakan login untuk menggunakan fitur Ummah Partner AI.",
+        text: "Silakan login untuk menggunakan fitur Sera AI.",
         showCancelButton: true,
         confirmButtonText: "Login Sekarang",
         cancelButtonText: "Nanti Saja",
@@ -766,7 +766,7 @@ export default function UmmahPartner() {
     const maxTextWidth = pageWidth - 2 * margin;
 
     doc.setFontSize(18);
-    doc.text("Quiz Ummah Partner AI", margin, yPos);
+    doc.text("Quiz Sera AI", margin, yPos);
     yPos += 10;
     doc.setFontSize(12);
     const materiTitle = selectedDatabaseMateriId ? materis.find((m) => m._id === selectedDatabaseMateriId)?.judulMateri : uploadedPdfFileName || "Local PDF";
@@ -851,7 +851,7 @@ export default function UmmahPartner() {
           <div ref={chatContainerRef} className="overflow-y-auto space-y-4 bg-gray-50 px-6 py-4 h-[calc(100vh-144px)]">
             {chatHistory.length === 0 ? (
               <div className="text-center text-gray-500 mt-10 p-4 bg-white rounded-xl shadow-sm border border-gray-200">
-                <p className="text-lg mb-2">Halo, aku Ummah Partner AI!</p>
+                <p className="text-lg mb-2">Halo, aku Sera AI!</p>
                 <p className="text-sm">Mulai chat baru atau klik "Lihat Riwayat Percakapan" di panel kiri untuk melanjutkan sesi lama.</p>
               </div>
             ) : (
@@ -865,7 +865,7 @@ export default function UmmahPartner() {
                         </>
                       ) : (
                         <>
-                          <FaRobot className="mr-2 text-gray-600" /> Ummah Partner
+                          <FaRobot className="mr-2 text-gray-600" /> Sera AI
                         </>
                       )}
                       <button
@@ -885,7 +885,7 @@ export default function UmmahPartner() {
               <div className="flex justify-start items-start">
                 <div className="max-w-[70%] p-4 rounded-xl shadow-md bg-gray-200 text-gray-800 rounded-bl-none">
                   <p className="font-semibold mb-1 flex items-center">
-                    <FaRobot className="mr-2 text-gray-600" /> Ummah Partner
+                    <FaRobot className="mr-2 text-gray-600" /> Sera AI
                   </p>
                   <p className="flex items-center animate-pulse">
                     <FaSpinner className="animate-spin mr-2" /> mengetik...
@@ -1029,7 +1029,7 @@ export default function UmmahPartner() {
     return (
       <div className="p-6 flex-1 bg-gray-50 flex items-center justify-center">
         <div className="text-center text-gray-500 p-8 bg-white rounded-xl shadow-sm border border-gray-200">
-          <p className="text-xl mb-4">Halo, aku Ummah Partner AI!</p>
+          <p className="text-xl mb-4">Halo, aku Sera AI!</p>
           <p className="text-sm">Pilih mode dari panel kiri untuk memulai.</p>
         </div>
       </div>
@@ -1040,7 +1040,7 @@ export default function UmmahPartner() {
     <div className="flex flex-col md:flex-row h-screen bg-gray-100 font-inter text-gray-800">
       {/* Panel Kiri: Kontrol Fitur */}
       <div className="w-full md:w-1/3 lg:w-1/4 bg-white p-6 shadow-lg flex flex-col overflow-y-auto rounded-lg md:rounded-r-none">
-        <h2 className="text-2xl font-bold text-center text-[#045394] mb-6">Ummah Partner</h2>
+        <h2 className="text-2xl font-bold text-center text-[#045394] mb-6">Sera AI</h2>
 
         {/* Tombol Navigasi Mode */}
         <div className="grid grid-cols-2 gap-3 mb-6 border-b pb-4 border-gray-200">
@@ -1372,7 +1372,7 @@ export default function UmmahPartner() {
       {/* Header: Area Chat, Kuis, Flashcards, Mind Map */}
       <div className="flex-1 flex flex-col h-screen bg-white shadow-lg md:ml-4 rounded-lg md:rounded-l-none">
         <div className="p-4 bg-[#045394] text-white text-center text-xl font-semibold shadow-md sticky top-0 z-10 rounded-t-lg md:rounded-tl-none">
-          {currentMode === "chat" ? "Obrolan dengan Ummah Partner AI" : currentMode === "quiz" ? "Hasil Kuis" : currentMode === "flashcards" ? "Hasil Flashcards" : currentMode === "mindmap" ? "Mind Map" : "Ummah Partner AI"}
+          {currentMode === "chat" ? "Obrolan dengan Sera AI" : currentMode === "quiz" ? "Hasil Kuis" : currentMode === "flashcards" ? "Hasil Flashcards" : currentMode === "mindmap" ? "Mind Map" : "Sera AI"}
         </div>
 
         {renderMainContent()}

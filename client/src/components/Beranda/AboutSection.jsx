@@ -15,9 +15,9 @@ export const AboutSection = () => {
           </span>
           ?
         </h2>
-        <p className="text-gray-700 font-medium text-lg max-w-6xl mx-auto">
-          Lentera Umat adalah platform mengakses ilmu terpercaya dan berbagi donasi demi mewujudkan pendidikan inklusif dan masyarakat yang moderat. Kami menghubungkan masyarakat dengan sumber belajar kredibel yang didukung fitur AI,
-          sekaligus menghubungkan donatur dari semua kalangan dengan komunitas pendistribusi yang kemudian disalurkan ke anak-anak yang memiliki fasilitas pendidikan kurang layak.
+        <p className="text-gray-700 font-medium text-base max-w-6xl mx-auto">
+          Aksera adalah platform yang menggabungkan edukasi berbasis AI dan donasi barang pendidikan untuk membantu pemerataan akses belajar, khususnya di daerah 3T dan bagi penyandang disabilitas. Dengan fitur seperti Tanya PDF, Ringkas
+          PDF, Mindmap, dan Flashcard, Aksera memudahkan belajar sekaligus menyalurkan bantuan pendidikan secara transparan dan tepat sasaran.
         </p>
       </div>
     </section>

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useContext } from "react";
-import BookCard from "../components/UmmahBook/BookCard"; // Pastikan path ini benar
-import UploadBookForm from "../components/UmmahBook/UploadBookForm"; // Pastikan path ini benar
-import BookCardSkeleton from "../components/UmmahBook/BookCardSkeleton"; // Pastikan path ini benar
+import BookCard from "../components/Materi/BookCard"; // Pastikan path ini benar
+import UploadBookForm from "../components/Materi/UploadBookForm"; // Pastikan path ini benar
+import BookCardSkeleton from "../components/Materi/BookCardSkeleton"; // Pastikan path ini benar
 import { axiosInstance } from "../config"; // Pastikan path ini benar
 import { FaChevronDown } from "react-icons/fa"; // Untuk ikon dropdown
 import { UserContext } from "../context/UserContext";
@@ -26,11 +26,9 @@ const Pagination = ({ totalPages, paginate, currentPage }) => {
 
   return (
     <nav
-      className="inline-flex items-center rounded-md shadow mt-8"
+      className="inline-flex items-center rounded-lg shadow-md mt-8 overflow-hidden"
       style={{
-        border: "1px solid #d1d5db",
-        borderRadius: "0.375rem",
-        overflow: "hidden",
+        border: "1px solid #e2e8f0", // Border abu-abu muda
       }}
     >
       <a
@@ -39,7 +37,7 @@ const Pagination = ({ totalPages, paginate, currentPage }) => {
           if (currentPage > 1) paginate(currentPage - 1);
         }}
         href="#"
-        className={`px-3 py-2 text-sm font-bold border-r border-gray-300 ${currentPage === 1 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-800 hover:bg-gray-50"}`}
+        className={`px-4 py-2 text-sm font-semibold transition-all duration-200 ${currentPage === 1 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-700"} rounded-l-lg`}
       >
         &lt;
       </a>
@@ -52,7 +50,9 @@ const Pagination = ({ totalPages, paginate, currentPage }) => {
             paginate(number);
           }}
           href="#"
-          className={`px-4 py-2 text-sm font-bold border-r border-gray-300 ${currentPage === number ? "bg-orange-500 text-white z-10" : "bg-white text-gray-800 hover:bg-gray-50"}`}
+          className={`px-4 py-2 text-sm font-semibold border-x border-gray-200 transition-all duration-200 ${
+            currentPage === number ? "bg-[#045394] text-white z-10 scale-105" : "bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+          }`}
         >
           {number}
         </a>
@@ -61,14 +61,16 @@ const Pagination = ({ totalPages, paginate, currentPage }) => {
       {/* Tombol halaman terakhir jika ada lebih dari maxPageButtons dan halaman terakhir tidak terlihat */}
       {endPage < totalPages && (
         <>
-          <span className="px-4 py-2 text-sm font-bold border-r border-gray-300 bg-white text-gray-800">...</span>
+          <span className="px-4 py-2 text-sm font-semibold border-x border-gray-200 bg-white text-gray-700">...</span>
           <a
             onClick={(e) => {
               e.preventDefault();
               paginate(totalPages);
             }}
             href="#"
-            className={`px-4 py-2 text-sm font-bold border-r border-gray-300 ${currentPage === totalPages ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-800 hover:bg-gray-50"}`}
+            className={`px-4 py-2 text-sm font-semibold border-x border-gray-200 transition-all duration-200 ${
+              currentPage === totalPages ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+            }`}
           >
             {totalPages}
           </a>
@@ -81,7 +83,7 @@ const Pagination = ({ totalPages, paginate, currentPage }) => {
           if (currentPage < totalPages) paginate(currentPage + 1);
         }}
         href="#"
-        className={`px-3 py-2 text-sm font-bold ${currentPage === totalPages ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-800 hover:bg-gray-50"}`}
+        className={`px-4 py-2 text-sm font-semibold transition-all duration-200 ${currentPage === totalPages ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-700"} rounded-r-lg`}
       >
         &gt;
       </a>
@@ -89,7 +91,7 @@ const Pagination = ({ totalPages, paginate, currentPage }) => {
   );
 };
 
-function UmmahBook() {
+function Materi() {
   const { user } = useContext(UserContext);
   const [allBooks, setAllBooks] = useState([]);
   const [currentBooks, setCurrentBooks] = useState([]);
@@ -139,7 +141,11 @@ function UmmahBook() {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  const handleUploadSuccess = (newBook) => {};
+  const handleUploadSuccess = (newBook) => {
+    // Opsional: tambahkan buku baru ke daftar setelah berhasil diunggah
+    // setAllBooks((prevBooks) => [newBook, ...prevBooks]);
+    fetchBooks(); // Memuat ulang buku setelah unggah berhasil
+  };
 
   const handleBookmarkToggle = (bookId, isBookmarked) => {
     if (!user) return;
@@ -171,33 +177,42 @@ function UmmahBook() {
 
   return (
     <>
-      <main className="bg-gray-50 py-8">
+      <main className="bg-gradient-to-br from-blue-50 to-gray-100 py-12 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header Section */}
+          <div className="text-center mb-10">
+            <h1 className="text-4xl font-bold text-[#045394] mb-3">Jelajahi Materi</h1>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">Temukan berbagai materi yang terverifikasi, disajikan untuk berbagai tingkatan dan didukung dengan fitur Sera Ai.</p>
+          </div>
+
           {/* Top Search and Filter Bar */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-            <form onSubmit={(e) => e.preventDefault()} className="flex items-center w-full md:w-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 p-4 bg-white rounded-xl shadow-lg">
+            <form onSubmit={(e) => e.preventDefault()} className="flex items-center w-full md:w-auto flex-grow">
               <input
                 type="text"
-                placeholder="Cari Buku"
+                placeholder="Cari Judul Buku atau Penulis..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full md:w-80 px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-5 py-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#045394] focus:border-transparent text-gray-700 placeholder-gray-400 transition-all duration-200"
               />
-              <button type="submit" className="px-4 py-2 bg-orange-500 text-white font-semibold rounded-r-md hover:bg-orange-600">
+              <button type="submit" className="px-6 py-3 bg-[#045394] text-white font-semibold rounded-r-lg hover:bg-blue-800 transition-colors duration-200 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
                 </svg>
               </button>
             </form>
             <div className="relative md:w-64 w-full">
-              <div onClick={() => toggleDropdown("category")} className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer flex justify-between items-center">
+              <div
+                onClick={() => toggleDropdown("category")}
+                className="w-full px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#045394] focus:border-transparent cursor-pointer flex justify-between items-center bg-white text-gray-700 transition-all duration-200 hover:border-[#045394]"
+              >
                 {selectedCategory || "Pilih Kategori"}
-                <FaChevronDown className="w-3 text-gray-500" />
+                <FaChevronDown className="w-4 h-4 text-gray-500" />
               </div>
               {dropdowns.category && (
-                <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg max-h-60 overflow-auto shadow-lg animate-fadeIn">
+                <div className="absolute z-20 mt-2 w-full bg-white border border-gray-200 rounded-lg max-h-60 overflow-auto shadow-xl animate-fadeIn">
                   {categories.map((cat) => (
-                    <div key={cat} onClick={() => selectCategoryOption(cat)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                    <div key={cat} onClick={() => selectCategoryOption(cat)} className="px-5 py-3 hover:bg-blue-50 cursor-pointer text-gray-800 transition-colors duration-150">
                       {cat}
                     </div>
                   ))}
@@ -206,11 +221,11 @@ function UmmahBook() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             <div className="lg:col-span-2">
-              <h1 className="text-2xl font-bold text-gray-800 mb-4">Buku yang Tersedia</h1>
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-[#045394] pb-2">Koleksi Buku</h2>
               {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
                   {Array(booksPerPage)
                     .fill(0)
                     .map((_, index) => (
@@ -219,14 +234,15 @@ function UmmahBook() {
                 </div>
               ) : (
                 <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
                     {currentBooks.map((book) => (
                       <BookCard key={book._id} book={book} onBookmarkToggle={handleBookmarkToggle} />
                     ))}
                   </div>
                   {currentBooks.length === 0 && (
-                    <div className="text-center py-10 col-span-full">
-                      <p className="text-gray-600 text-lg">Tidak ada buku yang ditemukan.</p>
+                    <div className="text-center py-16 col-span-full bg-white rounded-lg shadow-md mt-8">
+                      <p className="text-gray-600 text-xl font-medium">Tidak ada buku yang ditemukan.</p>
+                      <p className="text-gray-500 mt-2">Coba sesuaikan pencarian atau filter Anda.</p>
                     </div>
                   )}
                 </>
@@ -245,4 +261,4 @@ function UmmahBook() {
   );
 }
 
-export default UmmahBook;
+export default Materi;

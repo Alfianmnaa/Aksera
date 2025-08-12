@@ -4,18 +4,18 @@ import shareIcon from "../../assets/CardDonasi/share.png";
 import { axiosInstance } from "../../config";
 import Swal from "sweetalert2";
 import { UserContext } from "../../context/UserContext";
-import CardSkleton2 from "./CardSkleton2";
+import CardSkleton2 from "./CardSkleton2"; // Assuming this component exists
 import personProfile from "../../assets/Navbar/personProfile.png";
 import { BsBookmark, BsBookmarkFill } from "react-icons/bs";
 
 export default function DetailBarang() {
   const { user } = useContext(UserContext);
-  const [donasi, setDonasi] = useState();
-  const [detilDonasi, setDetilDonasi] = useState();
-  const [dataUser, setDataUser] = useState();
-  const [detilUser, setDetilUser] = useState();
-  const [komunitasPenerimaUser, setKomunitasPenerimaUser] = useState();
-  const [komunitasPenerimaDetil, setKomunitasPenerimaDetil] = useState();
+  const [donasi, setDonasi] = useState(null); // Initialize with null
+  const [detilDonasi, setDetilDonasi] = useState(null); // Initialize with null
+  const [dataUser, setDataUser] = useState(null);
+  const [detilUser, setDetilUser] = useState(null);
+  const [komunitasPenerimaUser, setKomunitasPenerimaUser] = useState(null);
+  const [komunitasPenerimaDetil, setKomunitasPenerimaDetil] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
@@ -23,106 +23,145 @@ export default function DetailBarang() {
   const path = window.location.pathname.split("/")[4];
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (path) {
-      const fetchDonasi = async () => {
-        try {
-          const response = await axiosInstance.get(`/donasi/get/${path}`);
-
-          setDonasi(response.data);
-        } catch (err) {
-          setError(err.message || "Gagal mengambil data donasi");
-          navigate("/not-found");
-          return;
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchDonasi();
-      fetchDetilDonasi();
-    }
-  }, [path]);
-
+  // Fungsi untuk mengambil detail donasi
   const fetchDetilDonasi = async () => {
     try {
       const response = await axiosInstance.get(`/donasi/detil/get/${path}`);
       setDetilDonasi(response.data);
     } catch (err) {
       setError(err.message || "Gagal mengambil data detil donasi");
+      console.error("Error fetching detail donasi:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchDataUser = async () => {
+  // Fungsi untuk mengambil data donasi utama
+  const fetchDonasi = async () => {
     try {
-      if (donasi?.donasiUid) {
-        const response = await axiosInstance.get(`/user/get/${donasi.donasiUid}`);
-        setDataUser(response.data);
-      }
+      const response = await axiosInstance.get(`/donasi/get/${path}`);
+      setDonasi(response.data);
+      // Panggil fetchDetilDonasi di sini untuk memastikan urutan data
+      await fetchDetilDonasi();
     } catch (err) {
-      setError(err.message || "Gagal mengambil data user");
+      setError(err.message || "Gagal mengambil data donasi");
+      console.error("Error fetching donasi:", err);
+      // Arahkan ke not-found hanya jika donasi utama gagal diambil
+      navigate("/not-found");
+      return;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const fetchDetilUser = async () => {
-    try {
-      if (donasi?.donasiUid) {
-        const response = await axiosInstance.get(`/detil/get/${donasi.donasiUid}`);
-        setDetilUser(response.data);
-      }
-    } catch (err) {
-      setError(err.message || "Gagal mengambil data detil user");
-    }
-  };
-
-  const fetchKomunitasPenerima = async () => {
-    try {
-      if (detilDonasi?.komunitasPengambilId) {
-        const resUser = await axiosInstance.get(`/user/get/${detilDonasi.komunitasPengambilId}`);
-        setKomunitasPenerimaUser(resUser.data);
-        const resDetil = await axiosInstance.get(`/detil/get/${detilDonasi.komunitasPengambilId}`);
-        setKomunitasPenerimaDetil(resDetil.data);
-      }
-    } catch (err) {
-      console.error("Gagal mengambil data komunitas penerima:", err);
-    }
-  };
-
+  // useEffect pertama: Mengambil data donasi dan detail donasi saat path berubah
   useEffect(() => {
-    if (user?._id) {
-      axiosInstance.get(`/donasi/get/${path}`).then((res) => {
-        const donasi = res.data;
-        setIsSaved(donasi.disimpan?.includes(user._id));
-      });
+    if (path) {
+      setLoading(true); // Set loading true every time path changes
+      fetchDonasi(); // Initial fetch
     }
-  }, [path, user?._id]);
+  }, [path]); // Dependency array hanya pada 'path'
+
+  // Fungsi untuk memuat ulang data donasi dan detail donasi secara lengkap
+  const refetchDonasiDetails = async () => {
+    setLoading(true); // Set loading true during refetch
+    await fetchDonasi(); // Re-fetch all related data
+  };
+
+  // useEffect untuk mengambil data user (donor) setelah donasi dimuat
+  useEffect(() => {
+    const fetchDataUser = async () => {
+      try {
+        if (donasi?.donasiUid) {
+          const response = await axiosInstance.get(`/user/get/${donasi.donasiUid}`);
+          setDataUser(response.data);
+        }
+      } catch (err) {
+        setError(err.message || "Gagal mengambil data user");
+        console.error("Error fetching user data:", err);
+      }
+    };
+
+    const fetchDetilUser = async () => {
+      try {
+        if (donasi?.donasiUid) {
+          const response = await axiosInstance.get(`/detil/get/${donasi.donasiUid}`);
+          setDetilUser(response.data);
+        }
+      } catch (err) {
+        setError(err.message || "Gagal mengambil data detil user");
+        console.error("Error fetching user detail:", err);
+      }
+    };
+
+    if (donasi) {
+      // Hanya jalankan jika donasi sudah ada
+      fetchDataUser();
+      fetchDetilUser();
+    }
+  }, [donasi]); // Dependency array pada 'donasi'
+
+  // useEffect untuk mengambil data komunitas penerima jika status "disalurkan"
+  useEffect(() => {
+    const fetchKomunitasPenerima = async () => {
+      try {
+        if (detilDonasi?.komunitasPengambilId) {
+          const resUser = await axiosInstance.get(`/user/get/${detilDonasi.komunitasPengambilId}`);
+          setKomunitasPenerimaUser(resUser.data);
+          const resDetil = await axiosInstance.get(`/detil/get/${detilDonasi.komunitasPengambilId}`);
+          setKomunitasPenerimaDetil(resDetil.data);
+        }
+      } catch (err) {
+        console.error("Gagal mengambil data komunitas penerima:", err);
+        setError(err.message || "Gagal mengambil data komunitas penerima");
+      }
+    };
+
+    if (detilDonasi?.namaStatus === "disalurkan") {
+      fetchKomunitasPenerima();
+    }
+  }, [detilDonasi]); // Dependency array pada 'detilDonasi'
+
+  // useEffect untuk mengecek status simpan
+  useEffect(() => {
+    if (user?._id && donasi?._id) {
+      // Pastikan user dan donasi sudah ada
+      setIsSaved(donasi.disimpan?.includes(user._id));
+    }
+  }, [donasi, user?._id]); // Dependency array pada 'donasi' dan 'user._id'
 
   const handleSave = async (e) => {
     e.stopPropagation();
-    if (!user?._id) return alert("Login terlebih dahulu");
+    if (!user?._id) {
+      Swal.fire({
+        title: "Login Diperlukan",
+        text: "Anda harus login terlebih dahulu untuk menyimpan donasi.",
+        icon: "info",
+        confirmButtonText: "Oke",
+      });
+      return;
+    }
 
     try {
       await axiosInstance.put(`/donasi/toggle-simpan/${path}`, { userId: user._id });
       setIsSaved((prev) => !prev);
     } catch (error) {
       console.error("Gagal simpan donasi:", error);
+      Swal.fire("Gagal", "Terjadi kesalahan saat menyimpan donasi.", "error");
     }
   };
-  useEffect(() => {
-    if (donasi) {
-      fetchDataUser();
-      fetchDetilUser();
-    }
-  }, [donasi]);
 
-  useEffect(() => {
-    if (detilDonasi?.namaStatus === "disalurkan") {
-      fetchKomunitasPenerima();
+  if (loading || !donasi || !detilDonasi) {
+    // Tampilkan skeleton loader atau pesan error jika ada
+    if (error) {
+      return (
+        <div className="flex justify-center items-center h-screen text-red-600 text-lg">
+          <p>{error}</p>
+        </div>
+      );
     }
-  }, [detilDonasi]);
-
-  if (loading) return <CardSkleton2 />;
+    return <CardSkleton2 />;
+  }
 
   const pathSegments = location.pathname.split("/").filter(Boolean);
   const date = new Date(donasi?.createdAt).toLocaleDateString("id-ID", {
@@ -143,12 +182,18 @@ export default function DetailBarang() {
         })
         .catch((error) => console.error("Error berbagi:", error));
     } else {
-      alert("Fungsi share tidak didukung di browser ini.");
+      Swal.fire({
+        title: "Fungsi Share Tidak Didukung",
+        text: "Fitur berbagi tidak didukung di browser ini. Anda bisa menyalin URL secara manual.",
+        icon: "info",
+        confirmButtonText: "Oke",
+      });
     }
   };
 
   const handleDeleteDonasi = async () => {
-    const confirm = await Swal.fire({
+    const confirmResult = await Swal.fire({
+      // Ubah nama variabel agar tidak bentrok dengan keyword
       title: "Yakin ingin menghapus?",
       text: "Data donasi yang sudah dihapus tidak bisa dikembalikan.",
       icon: "warning",
@@ -157,13 +202,13 @@ export default function DetailBarang() {
       cancelButtonText: "Batal",
     });
 
-    if (confirm.isConfirmed) {
+    if (confirmResult.isConfirmed) {
       try {
         await axiosInstance.delete(`/donasi/delete/${donasi._id}`);
         await Swal.fire("Terhapus!", "Donasi telah dihapus.", "success");
-        window.location.href = "/donasi-saya";
+        window.location.href = "/donasi-saya"; // Redirect setelah berhasil
       } catch (err) {
-        Swal.fire("Gagal", err?.response?.data || "Terjadi kesalahan.", "error");
+        Swal.fire("Gagal", err?.response?.data?.message || "Terjadi kesalahan.", "error");
       }
     }
   };
@@ -203,14 +248,17 @@ export default function DetailBarang() {
         <h1 className="text-3xl font-bold py-4">Detail Barang</h1>
 
         <div className="p-6 md:p-8 mt-4 rounded-2xl shadow-md border bg-[#f8f8f8]">
-          <div className="grid grid-cols-0 md:grid-cols-5 gap-6">
-            <img src={donasi.fotoBarang} alt={donasi.namaBarang} className="w-full md:col-span-2 h-72 bg-gray-300 object-cover rounded-lg" />
-
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+            {" "}
+            {/* Changed from 0 to 1 for better mobile */}
+            {/* Menggunakan optional chaining di sini */}
+            <img src={donasi?.fotoBarang} alt={donasi?.namaBarang} className="w-full md:col-span-2 h-72 bg-gray-300 object-cover rounded-lg" />
             <div className="md:col-span-3 relative flex flex-col justify-between pt-6 md:pt-2 md:pb-0">
               <div className="space-y-2">
                 <div className="flex items-start justify-between">
-                  <h2 className="text-2xl font-bold">{donasi.namaBarang}</h2>
-                  <div className="absolute -top-2 sm:static sm:w-fit left-0 flex items-center  justify-between w-full space-x-2">
+                  {/* Menggunakan optional chaining di sini */}
+                  <h2 className="text-2xl font-bold">{donasi?.namaBarang}</h2>
+                  <div className="absolute -top-2 sm:static sm:w-fit left-0 flex items-center justify-between w-full space-x-2">
                     {detilDonasi?.namaStatus === "tersedia" ? (
                       <span className="bg-green-200 text-green-800 border-green-950 text-xs font-semibold px-3 py-1 rounded-full">Tersedia</span>
                     ) : (
@@ -220,25 +268,28 @@ export default function DetailBarang() {
                   </div>
                 </div>
 
-                <p className="text-gray-600 text-sm">{donasi.kondisiBarang}</p>
+                {/* Menggunakan optional chaining di sini */}
+                <p className="text-gray-600 text-sm">{donasi?.kondisiBarang}</p>
 
                 <div className="space-y-1">
                   <h3 className="font-semibold">Deskripsi:</h3>
-                  <p className="text-gray-700 text-sm">{donasi.deskripsi}</p>
+                  {/* Menggunakan optional chaining di sini */}
+                  <p className="text-gray-700 text-sm">{donasi?.deskripsi}</p>
                 </div>
               </div>
 
-              {dataUser && (
+              {dataUser && ( // Render hanya jika dataUser sudah ada
                 <div className="flex flex-wrap md:flex-col justify-between pt-4 gap-4">
                   <div className="flex items-center md:self-start space-x-3">
                     {hasValidProfilePhoto ? (
-                      <img src={detilUser?.fotoProfil} alt={dataUser.username} className="w-10 h-10 rounded-full object-cover" />
+                      <img src={detilUser?.fotoProfil} alt={dataUser?.username} className="w-10 h-10 rounded-full object-cover" />
                     ) : (
-                      <img src={personProfile} alt="profile" className="p-2 bg-gray-500 bg-opacity-75 w-110 h-10 rounded-full object-cover" />
+                      <img src={personProfile} alt="profile" className="p-2 bg-gray-500 bg-opacity-75 w-10 h-10 rounded-full object-cover" />
                     )}
                     <div>
-                      <p className="font-semibold text-sm">{dataUser.username}</p>
-                      <p className="text-gray-500 text-xs">{donasi.kabupaten + ", " + donasi.provinsi}</p>
+                      <p className="font-semibold text-sm">{dataUser?.username}</p>
+                      {/* Menggunakan optional chaining di sini */}
+                      <p className="text-gray-500 text-xs">{donasi?.kabupaten + ", " + donasi?.provinsi}</p>
                     </div>
                   </div>
                   <div className="flex items-center md:self-end space-x-3">
@@ -266,25 +317,36 @@ export default function DetailBarang() {
           <div className="mt-8 p-4 border rounded-xl bg-green-50">
             <h3 className="text-lg font-semibold mb-4">Telah diterima oleh:</h3>
             <div className="flex items-center space-x-4">
-              <img src={komunitasPenerimaDetil.fotoProfil} alt={komunitasPenerimaUser.username} className="w-14 h-14 rounded-full object-cover border" />
+              <img src={komunitasPenerimaDetil?.fotoProfil} alt={komunitasPenerimaUser?.username} className="w-14 h-14 rounded-full object-cover border" />
               <div>
-                <p className="text-md font-bold">{komunitasPenerimaDetil.namaLengkap}</p>
-                <p className="text-gray-600 text-sm">@{komunitasPenerimaUser.username}</p>
+                <p className="text-md font-bold">{komunitasPenerimaDetil?.namaLengkap}</p>
+                <p className="text-gray-600 text-sm">@{komunitasPenerimaUser?.username}</p>
               </div>
             </div>
           </div>
         )}
 
-        {user?.role === "komunitas" && detilDonasi?.namaStatus === "tersedia" && <AjukanPermohonan detilDonasi={detilDonasi} userId={user._id} donasiId={detilDonasi._id} />}
+        {/* Meneruskan fungsi refetchDonasiDetails ke AjukanPermohonan */}
+        {user?.role === "komunitas" && detilDonasi?.namaStatus === "tersedia" && (
+          <AjukanPermohonan
+            detilDonasi={detilDonasi}
+            userId={user._id}
+            donasiId={detilDonasi._id}
+            onPermohonanSuccess={refetchDonasiDetails} // Prop baru
+          />
+        )}
       </div>
     </>
   );
 }
 
-function AjukanPermohonan({ detilDonasi, userId, donasiId }) {
+function AjukanPermohonan({ detilDonasi, userId, donasiId, onPermohonanSuccess }) {
+  // Menerima prop baru
   const [sudahMengajukan, setSudahMengajukan] = useState(false);
   const [tujuan, setTujuan] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false); // Pindahkan deklarasi ke atas
 
+  // Pastikan detilDonasi dan permohonan ada sebelum mengakses
   useEffect(() => {
     const isAlreadySubmitted = detilDonasi?.permohonan?.some((p) => p.pemohonId === userId);
     setSudahMengajukan(isAlreadySubmitted);
@@ -306,9 +368,14 @@ function AjukanPermohonan({ detilDonasi, userId, donasiId }) {
       });
 
       await Swal.fire("Berhasil!", "Permohonan Anda telah dikirim.", "success");
-      setSudahMengajukan(true);
+      setSudahMengajukan(true); // Update state lokal komponen AjukanPermohonan
+      setTujuan(""); // Reset input tujuan
+      if (onPermohonanSuccess) {
+        onPermohonanSuccess(); // Panggil fungsi callback untuk memicu re-fetch di parent
+      }
     } catch (err) {
-      Swal.fire("Gagal", err?.response?.data || "Terjadi kesalahan.", "error");
+      console.error("Error submitting permohonan:", err);
+      Swal.fire("Gagal", err?.response?.data?.message || "Terjadi kesalahan.", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -321,8 +388,6 @@ function AjukanPermohonan({ detilDonasi, userId, donasiId }) {
       </div>
     );
   }
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   return (
     <div className="mt-6">
@@ -344,11 +409,7 @@ function AjukanPermohonan({ detilDonasi, userId, donasiId }) {
           />
 
           <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={!tujuan.trim() || isSubmitting}
-              className="bg-primary hover:bg-primary/80 disabled:bg-gray-400 text-white font-medium px-6 py-2 rounded-full shadow-md transition flex items-center gap-2"
-            >
+            <button type="submit" disabled={!tujuan.trim() || isSubmitting} className="bg-primary hover:bg-primary/80 disabled:bg-gray-400 text-white font-medium px-6 py-2 rounded-full shadow-md transition flex items-center gap-2">
               {isSubmitting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

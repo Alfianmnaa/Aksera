@@ -1,4 +1,4 @@
-const ChatSession = require("../models/ChatSession");
+const ChatSession = require("../models/chatSession");
 
 // Membuat sesi chat baru
 exports.createChatSession = async (req, res) => {

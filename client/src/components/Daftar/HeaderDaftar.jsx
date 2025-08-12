@@ -1,16 +1,19 @@
-import React from 'react';
+import React from "react";
 import { BookOpen } from "lucide-react";
+import akseraLogo from "../../assets/Daftar/Aksera_svg.svg";
 
 export default function HeaderDaftar() {
   return (
     <div>
       {/* Logo */}
       <div className="flex justify-center mb-6">
-        <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
-          <BookOpen className="w-8 h-8 text-white" />
+        <div className="w-16 h-16 rounded-full flex items-center justify-center">
+          <img src={akseraLogo} alt="aksera icon" />
+
+          {/* <BookOpen className="w-8 h-8 text-white" /> */}
         </div>
       </div>
-      
+
       {/* Header Text */}
       <div className="text-center">
         <h1 className="text-3xl font-bold">

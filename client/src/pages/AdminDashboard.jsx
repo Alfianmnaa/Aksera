@@ -1,16 +1,29 @@
 import React, { useState, useEffect, useContext, useCallback, useRef } from "react";
-import { axiosInstance } from "../config";
-import { UserContext } from "../context/UserContext";
-import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
-import BookCardSkeleton from "../components/UmmahBook/BookCardSkeleton";
+import { axiosInstance } from "../config"; // Assuming this path is correct in the user's project
+import { UserContext } from "../context/UserContext"; // Assuming this path is correct in the user's project
+import { useNavigate } from "react-router-dom"; // Assuming react-router-dom is installed
+import Swal from "sweetalert2"; // Assuming sweetalert2 is installed
 import Chart from "chart.js/auto";
 
-function AdminDashboard() {
+// Placeholder for BookCardSkeleton if it's not available, or you can remove this if user provides it
+// const BookCardSkeleton = () => (
+//   <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden flex flex-col transition-all duration-200 animate-pulse">
+//     <div className="h-48 w-full bg-gray-300 rounded-t-lg"></div>
+//     <div className="p-4 flex flex-col flex-grow">
+//       <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+//       <div className="h-4 bg-gray-300 rounded w-1/2 mb-2"></div>
+//       <div className="h-4 bg-gray-300 rounded w-2/3 mb-4"></div>
+//       <div className="h-8 bg-gray-300 rounded w-full mt-auto"></div>
+//     </div>
+//   </div>
+// );
+
+export default function AdminDashboard() {
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
 
   const [activeSection, setActiveSection] = useState("overview");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State for sidebar visibility
 
   const [rawBooks, setRawBooks] = useState([]);
   const [rawDonations, setRawDonations] = useState([]);
@@ -38,6 +51,7 @@ function AdminDashboard() {
 
   const chartInstances = useRef({});
 
+  // Function to destroy existing chart instances to prevent duplicates
   const destroyChart = (chartId) => {
     if (chartInstances.current[chartId]) {
       chartInstances.current[chartId].destroy();
@@ -45,11 +59,31 @@ function AdminDashboard() {
     }
   };
 
+  // Helper function for exponential backoff retry for API calls
+  const fetchWithRetry = async (url, options = {}, retries = 3, delay = 1000) => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await axiosInstance(url, options);
+        if (response.status >= 200 && response.status < 300) {
+          return response;
+        }
+      } catch (error) {
+        if (i < retries - 1) {
+          await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, i)));
+        } else {
+          throw error;
+        }
+      }
+    }
+    throw new Error("Max retries reached");
+  };
+
+  // Callback to fetch all books
   const fetchAllBooks = useCallback(async () => {
     setLoadingBooks(true);
     setErrorBooks(null);
     try {
-      const response = await axiosInstance.get("/materi/getall");
+      const response = await fetchWithRetry("/materi/getall");
       setRawBooks(response.data);
     } catch (err) {
       console.error("Error fetching all books:", err);
@@ -59,11 +93,12 @@ function AdminDashboard() {
     }
   }, []);
 
+  // Callback to fetch all donations
   const fetchAllDonations = useCallback(async () => {
     setLoadingDonations(true);
     setErrorDonations(null);
     try {
-      const response = await axiosInstance.get("/donasi/getall");
+      const response = await fetchWithRetry("/donasi/getall");
       setRawDonations(response.data);
     } catch (err) {
       console.error("Error fetching all donations:", err);
@@ -73,11 +108,12 @@ function AdminDashboard() {
     }
   }, []);
 
+  // Callback to fetch all users
   const fetchAllUsers = useCallback(async () => {
     setLoadingUsers(true);
     setErrorUsers(null);
     try {
-      const response = await axiosInstance.get("/user/getall");
+      const response = await fetchWithRetry("/user/getall");
       setRawUsers(response.data);
     } catch (err) {
       console.error("Error fetching all users:", err);
@@ -87,11 +123,12 @@ function AdminDashboard() {
     }
   }, []);
 
+  // Callback to fetch all articles
   const fetchAllArticles = useCallback(async () => {
     setLoadingArticles(true);
     setErrorArticles(null);
     try {
-      const response = await axiosInstance.get("/artikel/getall");
+      const response = await fetchWithRetry("/artikel/getall");
       setRawArticles(response.data);
     } catch (err) {
       console.error("Error fetching all articles:", err);
@@ -101,6 +138,7 @@ function AdminDashboard() {
     }
   }, []);
 
+  // Effect to handle user role verification and initial data fetching
   useEffect(() => {
     if (user) {
       if (user?.role !== "admin") {
@@ -113,12 +151,14 @@ function AdminDashboard() {
       fetchAllDonations();
       fetchAllUsers();
       fetchAllArticles();
-    } else {
     }
+    // No else block needed as user not being present is handled by isLoadingInitialData / directly below
   }, [user, navigate, fetchAllBooks, fetchAllDonations, fetchAllUsers, fetchAllArticles]);
 
+  // Effect to render charts when data is loaded and section is "overview"
   useEffect(() => {
     if (activeSection === "overview" && !loadingBooks && !loadingDonations && !loadingUsers) {
+      // Book Category Chart
       if (bookCategoryChartRef.current) {
         destroyChart("bookCategoryChart");
         const ctx = bookCategoryChartRef.current.getContext("2d");
@@ -164,6 +204,7 @@ function AdminDashboard() {
         });
       }
 
+      // Donation Province Chart
       if (donationProvinceChartRef.current) {
         destroyChart("donationProvinceChart");
         const ctx = donationProvinceChartRef.current.getContext("2d");
@@ -174,7 +215,7 @@ function AdminDashboard() {
 
         const sortedProvinces = Object.entries(provinceCounts)
           .sort(([, a], [, b]) => b - a)
-          .slice(0, 5);
+          .slice(0, 5); // Display top 5 provinces
 
         chartInstances.current.donationProvinceChart = new Chart(ctx, {
           type: "bar",
@@ -228,6 +269,7 @@ function AdminDashboard() {
         });
       }
 
+      // User Role Chart
       if (userRoleChartRef.current) {
         destroyChart("userRoleChart");
         const ctx = userRoleChartRef.current.getContext("2d");
@@ -274,12 +316,14 @@ function AdminDashboard() {
       }
     }
 
+    // Cleanup function to destroy all charts when component unmounts or activeSection changes
     return () => {
       Object.values(chartInstances.current).forEach((chart) => chart.destroy());
       chartInstances.current = {};
     };
   }, [activeSection, loadingBooks, loadingDonations, loadingUsers, rawBooks, rawDonations, rawUsers]);
 
+  // Function to approve (verify) a book
   const handleApprove = async (bookId) => {
     Swal.fire({
       title: "Konfirmasi Verifikasi",
@@ -301,11 +345,12 @@ function AdminDashboard() {
           },
         });
         try {
-          await axiosInstance.put(`/materi/update/${bookId}`, {
-            statusMateri: "terverifikasi",
+          await fetchWithRetry(`/materi/update/${bookId}`, {
+            method: "PUT",
+            data: { statusMateri: "terverifikasi" },
           });
           Swal.fire("Berhasil!", "Materi berhasil diverifikasi.", "success");
-          fetchAllBooks();
+          fetchAllBooks(); // Refresh book list
         } catch (error) {
           console.error("Error approving book:", error);
           Swal.fire("Gagal!", "Terjadi kesalahan saat memverifikasi materi.", "error");
@@ -314,6 +359,7 @@ function AdminDashboard() {
     });
   };
 
+  // Function to unverify a book
   const handleUnverify = async (bookId) => {
     Swal.fire({
       title: "Batalkan Verifikasi",
@@ -335,11 +381,12 @@ function AdminDashboard() {
           },
         });
         try {
-          await axiosInstance.put(`/materi/update/${bookId}`, {
-            statusMateri: "belum terverifikasi",
+          await fetchWithRetry(`/materi/update/${bookId}`, {
+            method: "PUT",
+            data: { statusMateri: "belum terverifikasi" },
           });
           Swal.fire("Berhasil!", "Verifikasi materi berhasil dibatalkan.", "success");
-          fetchAllBooks();
+          fetchAllBooks(); // Refresh book list
         } catch (error) {
           console.error("Error unverifying book:", error);
           Swal.fire("Gagal!", "Terjadi kesalahan saat membatalkan verifikasi materi.", "error");
@@ -348,6 +395,7 @@ function AdminDashboard() {
     });
   };
 
+  // Function to delete a book
   const handleDeleteBook = async (bookId) => {
     Swal.fire({
       title: "Konfirmasi Hapus Materi",
@@ -369,9 +417,9 @@ function AdminDashboard() {
           },
         });
         try {
-          await axiosInstance.delete(`/materi/delete/${bookId}`);
+          await fetchWithRetry(`/materi/delete/${bookId}`, { method: "DELETE" });
           Swal.fire("Berhasil!", "Materi berhasil dihapus.", "success");
-          fetchAllBooks();
+          fetchAllBooks(); // Refresh book list
         } catch (error) {
           console.error("Error deleting book:", error);
           Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus materi.", "error");
@@ -380,6 +428,7 @@ function AdminDashboard() {
     });
   };
 
+  // Function to delete a donation
   const handleDeleteDonation = async (donasiId) => {
     Swal.fire({
       title: "Konfirmasi Hapus Donasi",
@@ -401,9 +450,9 @@ function AdminDashboard() {
           },
         });
         try {
-          await axiosInstance.delete(`/donasi/delete/${donasiId}`);
+          await fetchWithRetry(`/donasi/delete/${donasiId}`, { method: "DELETE" });
           Swal.fire("Berhasil!", "Donasi berhasil dihapus.", "success");
-          fetchAllDonations();
+          fetchAllDonations(); // Refresh donation list
         } catch (error) {
           console.error("Error deleting donation:", error);
           Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus donasi.", "error");
@@ -412,6 +461,7 @@ function AdminDashboard() {
     });
   };
 
+  // Function to delete an article
   const handleDeleteArticle = async (artikelId) => {
     Swal.fire({
       title: "Konfirmasi Hapus Artikel",
@@ -433,9 +483,9 @@ function AdminDashboard() {
           },
         });
         try {
-          await axiosInstance.delete(`/artikel/delete/${artikelId}`);
+          await fetchWithRetry(`/artikel/delete/${artikelId}`, { method: "DELETE" });
           Swal.fire("Berhasil!", "Artikel berhasil dihapus.", "success");
-          fetchAllArticles();
+          fetchAllArticles(); // Refresh article list
         } catch (error) {
           console.error("Error deleting article:", error);
           Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus artikel.", "error");
@@ -444,6 +494,7 @@ function AdminDashboard() {
     });
   };
 
+  // Function to delete a user
   const handleDeleteUser = async (userId) => {
     Swal.fire({
       title: "Konfirmasi Hapus Pengguna",
@@ -465,9 +516,9 @@ function AdminDashboard() {
           },
         });
         try {
-          await axiosInstance.delete(`/user/delete/${userId}`);
+          await fetchWithRetry(`/user/delete/${userId}`, { method: "DELETE" });
           Swal.fire("Berhasil!", "Pengguna berhasil dihapus.", "success");
-          fetchAllUsers();
+          fetchAllUsers(); // Refresh user list
         } catch (error) {
           console.error("Error deleting user:", error);
           Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus pengguna.", "error");
@@ -476,6 +527,7 @@ function AdminDashboard() {
     });
   };
 
+  // Function to edit user role
   const handleEditUserRole = async (userId, currentRole) => {
     const { value: newRole } = await Swal.fire({
       title: "Edit Role Pengguna",
@@ -507,9 +559,12 @@ function AdminDashboard() {
         },
       });
       try {
-        await axiosInstance.put(`/user/update/${userId}`, { role: newRole });
+        await fetchWithRetry(`/user/update/${userId}`, {
+          method: "PUT",
+          data: { role: newRole },
+        });
         Swal.fire("Berhasil!", `Role pengguna berhasil diubah menjadi ${newRole}.`, "success");
-        fetchAllUsers();
+        fetchAllUsers(); // Refresh user list
       } catch (error) {
         console.error("Error updating user role:", error);
         Swal.fire("Gagal!", "Terjadi kesalahan saat memperbarui role pengguna.", "error");
@@ -517,6 +572,7 @@ function AdminDashboard() {
     }
   };
 
+  // Filtered data based on search terms
   const filteredBooks = rawBooks.filter(
     (book) => book.judulMateri.toLowerCase().includes(searchTermBooks.toLowerCase()) || book.penulis.toLowerCase().includes(searchTermBooks.toLowerCase()) || book.kategori.toLowerCase().includes(searchTermBooks.toLowerCase())
   );
@@ -535,12 +591,15 @@ function AdminDashboard() {
 
   const filteredArticles = rawArticles.filter((artikel) => artikel.judulArtikel.toLowerCase().includes(searchTermArticles.toLowerCase()) || artikel.deskArtikel.toLowerCase().includes(searchTermArticles.toLowerCase()));
 
+  // Separate unverified and verified books
   const unverifiedBooks = filteredBooks.filter((book) => book.statusMateri === "belum terverifikasi");
   const verifiedBooks = filteredBooks.filter((book) => book.statusMateri === "terverifikasi");
 
+  // Loading and error states for initial data
   const isLoadingInitialData = loadingBooks || loadingDonations || loadingUsers || loadingArticles;
   const hasError = errorBooks || errorDonations || errorUsers || errorArticles;
 
+  // Render loading state if user data is not yet available
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -549,19 +608,36 @@ function AdminDashboard() {
     );
   }
 
+  // Prevent non-admin users from seeing the dashboard content
   if (user.role !== "admin") {
-    return null;
+    return null; // The redirect is handled by Swal.fire in useEffect
   }
 
   return (
     <div className="flex min-h-screen bg-gray-100 font-inter">
-      <aside className="w-64 bg-gray-800 text-white flex flex-col p-4 shadow-lg rounded-r-xl">
-        <div className="text-2xl font-bold text-center mb-10 text-indigo-400">Admin Panel</div>
+      {/* Sidebar - Hidden on small screens by default, visible when isSidebarOpen is true */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 text-white flex flex-col p-4 shadow-lg rounded-r-xl
+        transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out
+        md:relative md:translate-x-0 md:flex`}
+      >
+        <div className="flex justify-between items-center mb-10">
+          <div className="text-2xl font-bold text-center text-indigo-400">Admin Panel</div>
+          {/* Close button for sidebar on small screens */}
+          <button className="md:hidden text-gray-400 hover:text-white" onClick={() => setIsSidebarOpen(false)} aria-label="Close sidebar">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
         <nav className="flex-1">
           <ul>
             <li className="mb-2">
               <button
-                onClick={() => setActiveSection("overview")}
+                onClick={() => {
+                  setActiveSection("overview");
+                  setIsSidebarOpen(false);
+                }}
                 className={`w-full text-left py-3 px-4 rounded-lg flex items-center transition duration-200 ${activeSection === "overview" ? "bg-indigo-600 text-white shadow-md" : "hover:bg-gray-700 text-gray-300"}`}
               >
                 <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -577,7 +653,10 @@ function AdminDashboard() {
             </li>
             <li className="mb-2">
               <button
-                onClick={() => setActiveSection("ebooks")}
+                onClick={() => {
+                  setActiveSection("ebooks");
+                  setIsSidebarOpen(false);
+                }}
                 className={`w-full text-left py-3 px-4 rounded-lg flex items-center transition duration-200 ${activeSection === "ebooks" ? "bg-indigo-600 text-white shadow-md" : "hover:bg-gray-700 text-gray-300"}`}
               >
                 <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -593,7 +672,10 @@ function AdminDashboard() {
             </li>
             <li className="mb-2">
               <button
-                onClick={() => setActiveSection("donations")}
+                onClick={() => {
+                  setActiveSection("donations");
+                  setIsSidebarOpen(false);
+                }}
                 className={`w-full text-left py-3 px-4 rounded-lg flex items-center transition duration-200 ${activeSection === "donations" ? "bg-indigo-600 text-white shadow-md" : "hover:bg-gray-700 text-gray-300"}`}
               >
                 <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -609,7 +691,10 @@ function AdminDashboard() {
             </li>
             <li className="mb-2">
               <button
-                onClick={() => setActiveSection("users")}
+                onClick={() => {
+                  setActiveSection("users");
+                  setIsSidebarOpen(false);
+                }}
                 className={`w-full text-left py-3 px-4 rounded-lg flex items-center transition duration-200 ${activeSection === "users" ? "bg-indigo-600 text-white shadow-md" : "hover:bg-gray-700 text-gray-300"}`}
               >
                 <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -620,7 +705,10 @@ function AdminDashboard() {
             </li>
             <li className="mb-2">
               <button
-                onClick={() => setActiveSection("articles")}
+                onClick={() => {
+                  setActiveSection("articles");
+                  setIsSidebarOpen(false);
+                }}
                 className={`w-full text-left py-3 px-4 rounded-lg flex items-center transition duration-200 ${activeSection === "articles" ? "bg-indigo-600 text-white shadow-md" : "hover:bg-gray-700 text-gray-300"}`}
               >
                 <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -633,15 +721,38 @@ function AdminDashboard() {
         </nav>
       </aside>
 
+      {/* Overlay for small screens when sidebar is open */}
+      {isSidebarOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={() => setIsSidebarOpen(false)}></div>}
+
+      {/* Main content area */}
       <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+        {/* Hamburger menu button - only visible on small screens */}
+        <div className="flex justify-between items-center mb-6 md:hidden">
+          <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
+          <button className="p-2 text-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" onClick={() => setIsSidebarOpen(!isSidebarOpen)} aria-label="Toggle sidebar">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+
         {isLoadingInitialData ? (
           <div className="max-w-7xl mx-auto py-8">
             <h1 className="text-3xl font-bold text-gray-800 mb-6">Memuat Dashboard...</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* If BookCardSkeleton is not provided, use a simple loading skeleton */}
               {Array(6)
                 .fill(0)
                 .map((_, index) => (
-                  <BookCardSkeleton key={index} />
+                  <div key={index} className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden flex flex-col transition-all duration-200 animate-pulse">
+                    <div className="h-48 w-full bg-gray-300 rounded-t-lg"></div>
+                    <div className="p-4 flex flex-col flex-grow">
+                      <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                      <div className="h-4 bg-gray-300 rounded w-1/2 mb-2"></div>
+                      <div className="h-4 bg-gray-300 rounded w-2/3 mb-4"></div>
+                      <div className="h-8 bg-gray-300 rounded w-full mt-auto"></div>
+                    </div>
+                  </div>
                 ))}
             </div>
           </div>
@@ -655,8 +766,7 @@ function AdminDashboard() {
           <>
             {activeSection === "overview" && (
               <section className="mb-12">
-                <h1 className="text-4xl font-extrabold text-gray-900 mb-8">Overview Dashboard</h1>
-
+                <h1 className="hidden md:block text-4xl font-extrabold text-gray-900 mb-8">Overview Dashboard</h1> {/* Hide on mobile when hamburger is visible */}
                 <div className="mb-12 bg-white p-6 rounded-xl shadow-lg border border-gray-200">
                   <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">Ringkasan Statistik</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -678,7 +788,6 @@ function AdminDashboard() {
                     </div>
                   </div>
                 </div>
-
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 h-96">
                     <canvas ref={bookCategoryChartRef}></canvas>
@@ -999,5 +1108,3 @@ function AdminDashboard() {
     </div>
   );
 }
-
-export default AdminDashboard;

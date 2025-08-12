@@ -8,7 +8,8 @@ import Indonesia from "./dataProvinsi";
 import { UserContext } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { FaChevronDown } from "react-icons/fa";
+import locationIcon from "../../assets/LihatDonasi/location.svg";
+import arrowDown from "../../assets/LihatDonasi/arrowDown.svg";
 import "../../App.css";
 
 export default function FormUpload() {
@@ -27,12 +28,10 @@ export default function FormUpload() {
   const [kabupatenOptions, setKabupatenOptions] = useState([]);
   const [filePreview, setFilePreview] = useState(null);
   const [file, setFile] = useState(null);
-  const [dropdowns, setDropdowns] = useState({
-    provinsi: false,
-    kabupaten: false,
-    kategori: false,
-    kondisiBarang: false,
-  });
+  const [isOpenKategori, setIsOpenKategori] = useState(false);
+  const [isOpenKondisi, setIsOpenKondisi] = useState(false);
+  const [isOpenProvinsi, setIsOpenProvinsi] = useState(false);
+  const [isOpenKabupaten, setIsOpenKabupaten] = useState(false);
 
   const navigate = useNavigate();
 
@@ -136,151 +135,237 @@ export default function FormUpload() {
     }
   };
 
-  const toggleDropdown = (name) => {
-    setDropdowns((prev) => ({
-      ...prev,
-      [name]: !prev[name],
-    }));
+  const handleKategoriChange = (value) => {
+    setFormData(prev => ({ ...prev, kategori: value }));
+    setIsOpenKategori(false);
   };
 
-  const selectOption = (field, value) => {
-    setFormData({ ...formData, [field]: value });
-    setDropdowns({ ...dropdowns, [field]: false });
+  const handleKondisiChange = (value) => {
+    setFormData(prev => ({ ...prev, kondisiBarang: value }));
+    setIsOpenKondisi(false);
+  };
+
+  const handleProvinsiChange = (value) => {
+    const selectedProvince = Indonesia.find((provinsi) => provinsi.namaProvinsi === value);
+    setFormData(prev => ({ 
+      ...prev, 
+      provinsi: value, 
+      kabupaten: "" 
+    }));
+    setKabupatenOptions(selectedProvince ? selectedProvince.kabupatenKota : []);
+    setIsOpenProvinsi(false);
+  };
+
+  const handleKabupatenChange = (value) => {
+    setFormData(prev => ({ ...prev, kabupaten: value }));
+    setIsOpenKabupaten(false);
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-8 sm:px-6 md:px-16 py-10 sm:py-16 mb-16 rounded-xl sm:rounded-2xl shadow-md sm:shadow-[0px_0px_6px_2px_rgba(0,0,0,0.12)]">
-      <h2 className="text-xl sm:text-2xl text-center text-primary font-semibold mb-8 sm:mb-12">Silakan Isi Form Donasi Barang secara Detail</h2>
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label className="block font-semibold text-sm sm:text-base mb-2">Nama Barang</label>
-          <input type="text" name="namaBarang" value={formData.namaBarang} onChange={handleChange} placeholder="Ketikkan Nama Barang" className="w-full p-4 border-2 border-gray-300 rounded-lg outline-none text-sm sm:text-base" />
-        </div>
+    <div className="max-w-5xl md:mx-auto m-3 my-10 p-8 bg-white rounded-2xl shadow-md">
+      <h2 className="text-3xl font-bold text-center text-[#004b57] mb-10">
+        Silakan Isi Form Donasi Barang
+      </h2>
 
-        <div>
-          <label className="block font-semibold text-sm sm:text-base mb-2">Upload Foto</label>
-          <label htmlFor="upload-foto">
-            <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 transition">
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Kolom Kiri */}
+        <div className="space-y-6">
+          {/* Nama Barang */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Nama Barang</label>
+            <input 
+              type="text" 
+              name="namaBarang" 
+              value={formData.namaBarang} 
+              onChange={handleChange} 
+              placeholder="Tulis Nama Barang" 
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#045394]" 
+            />
+          </div>
+
+          {/* Upload Foto */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Upload Foto</label>
+            <label htmlFor="upload-foto" className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#045394] transition cursor-pointer block">
+              <input id="upload-foto" type="file" name="foto" accept="image/*" onChange={handleFileChange} className="hidden" />
+              
               {filePreview ? (
-                <div className="mt-4 text-sm text-gray-700 w-full">
-                  {formData.fotoBarang?.type.startsWith("image/") ? (
-                    <div className="w-full flex justify-center">
-                      <img src={filePreview.url} alt="Preview" className="w-full max-h-[200px] object-cover rounded border" />
-                    </div>
-                  ) : (
-                    <p className="italic">Tidak dapat menampilkan pratinjau untuk file ini</p>
-                  )}
-                  <p className="mt-2 text-gray-600 text-center text-sm">Nama file: {filePreview.name}</p>
+                <div className="flex flex-col items-center justify-center">
+                  <img src={filePreview.url} alt="Preview" className="w-full max-h-[200px] object-cover rounded border mb-2" />
+                  <p className="text-sm text-gray-600">Nama file: {filePreview.name}</p>
                 </div>
               ) : (
-                <>
-                  <img src={addPhotoIcon} alt="upload icon" className="w-10 h-10 mb-4" />
-                  <p className="text-sm font-medium text-gray-700">Upload a file or drag and drop</p>
-                  <p className="text-xs text-gray-500">JPEG, JPG, PNG, PDF (max 5MB each)</p>
-                </>
+                <div className="flex flex-col items-center justify-center">
+                  <img alt="upload icon" className="w-10 h-10 mb-4" src={addPhotoIcon} />
+                  <p className="text-sm text-gray-500">Upload file atau drag & drop</p>
+                  <p className="text-xs text-gray-400 mt-1">JPEG, PNG • Maks 5MB</p>
+                </div>
               )}
-            </div>
-          </label>
-          <input id="upload-foto" type="file" name="foto" accept=".jpeg,.jpg,.png,.pdf" onChange={handleFileChange} className="hidden" multiple />
-        </div>
-
-        <div className="relative">
-          <label className="block font-semibold text-sm sm:text-base mb-2">Kategori Barang</label>
-          <div onClick={() => toggleDropdown("kategori")} className="w-full p-4 pr-10 border-2 border-gray-300 rounded-lg outline-none text-sm sm:text-base cursor-pointer">
-            {formData.kategori || "Pilih kategori barang"}
+            </label>
           </div>
-          <FaChevronDown className="w-3 absolute right-4 top-[68%] -translate-y-1/2 text-gray-500 pointer-events-none" />
-          {dropdowns.kategori && (
-            <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg max-h-60 overflow-auto shadow-lg animate-fadeIn">
-              {["pendidikan", "disabilitas", "elektronik"].map((item) => (
-                <div key={item} onClick={() => selectOption("kategori", item)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                  {item.charAt(0).toUpperCase() + item.slice(1)}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
 
-        <div className="relative">
-          <label className="block font-semibold text-sm sm:text-base mb-2">Jenis Barang</label>
-          <div onClick={() => toggleDropdown("kondisiBarang")} className="w-full p-4 pr-10 border-2 border-gray-300 rounded-lg outline-none text-sm sm:text-base cursor-pointer">
-            {formData.kondisiBarang || "Pilih Jenis Barang"}
-          </div>
-          <FaChevronDown className="w-3 absolute right-4 top-[68%] -translate-y-1/2 text-gray-500 pointer-events-none" />
-          {dropdowns.kondisiBarang && (
-            <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg max-h-60 overflow-auto shadow-lg animate-fadeIn">
-              {["Baru", "Layak Pakai"].map((item) => (
-                <div key={item} onClick={() => selectOption("kondisiBarang", item)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                  {item}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div>
-          <label className="block font-semibold text-sm sm:text-base mb-2">Deskripsi Barang</label>
-          <textarea
-            name="deskripsi"
-            value={formData.deskripsi}
-            onChange={handleChange}
-            placeholder="Jelaskan secara detail barang yang ingin anda upload"
-            className="w-full p-4 border-2 border-gray-300 rounded-lg outline-none text-sm sm:text-base"
-            rows="4"
-          />
-        </div>
-
-        {/* Provinsi */}
-        <div className="relative">
-          <label className="block font-semibold text-sm sm:text-base mb-2">Provinsi</label>
-          <div onClick={() => toggleDropdown("provinsi")} className="w-full p-4 border-2 border-gray-300 rounded-lg outline-none text-sm sm:text-base cursor-pointer">
-            {formData.provinsi || "Pilih Provinsi"}
-          </div>
-          <FaChevronDown className="w-3 absolute right-4 top-[68%] -translate-y-1/2 text-gray-500 pointer-events-none" />
-          {dropdowns.provinsi && (
-            <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg max-h-60 overflow-auto shadow-lg animate-fadeIn">
-              {Indonesia.map((provinsi) => (
-                <div
-                  key={provinsi.namaProvinsi}
-                  onClick={() => {
-                    selectOption("provinsi", provinsi.namaProvinsi);
-                    setKabupatenOptions(provinsi.kabupatenKota);
-                  }}
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                >
-                  {provinsi.namaProvinsi}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Kabupaten */}
-        {formData.provinsi && (
+          {/* Kategori */}
           <div className="relative">
-            <label className="block font-semibold text-sm sm:text-base mb-2">Kabupaten</label>
-            <div onClick={() => toggleDropdown("kabupaten")} className="w-full p-4 border-2 border-gray-300 rounded-lg outline-none text-sm sm:text-base cursor-pointer">
-              {formData.kabupaten || "Pilih Kabupaten"}
+            <label className="block text-sm font-semibold text-gray-800 mb-1">Kategori Barang</label>
+            <div
+              className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg bg-white text-gray-800 cursor-pointer flex justify-between items-center hover:border-gray-400 transition-colors duration-200"
+              onClick={() => setIsOpenKategori(!isOpenKategori)}
+            >
+              <span className="text-sm">
+                {formData.kategori ? formData.kategori.charAt(0).toUpperCase() + formData.kategori.slice(1) : "Pilih kategori barang"}
+              </span>
+              <img
+                src={arrowDown}
+                alt="arrowDown"
+                className={`w-3 transition-transform ${isOpenKategori ? "rotate-180" : ""}`}
+              />
             </div>
-            <FaChevronDown className="w-3 absolute right-4 top-[68%] -translate-y-1/2 text-gray-500 pointer-events-none" />
-            {dropdowns.kabupaten && (
-              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg max-h-60 overflow-auto shadow-lg animate-fadeIn">
-                {kabupatenOptions.map((kabupaten) => (
-                  <div key={kabupaten} onClick={() => selectOption("kabupaten", kabupaten)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                    {kabupaten}
-                  </div>
-                ))}
+            {isOpenKategori && (
+              <div className="absolute z-50 w-full max-h-60 overflow-y-auto mt-1 bg-white shadow-lg rounded-lg border border-gray-200">
+                <ul className="p-2">
+                  {["pendidikan", "disabilitas", "elektronik"].map((item) => (
+                    <li
+                      key={item}
+                      className="cursor-pointer hover:bg-gray-100 p-2 text-sm rounded"
+                      onClick={() => handleKategoriChange(item)}
+                    >
+                      {item.charAt(0).toUpperCase() + item.slice(1)}
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
           </div>
-        )}
 
-        {/* Submit Button */}
-        <div className="flex justify-end">
-          <button type="submit" className="bg-primary hover:bg-primary-700 flex gap-2 text-white font-semibold px-6 py-3 rounded-full shadow-md transition text-sm sm:text-base">
-            <p>Kirim</p>
-            <img src={sendIcon} className="w-5 sm:w-6" alt="" />
-          </button>
+          {/* Jenis */}
+          <div className="relative">
+            <label className="block text-sm font-semibold text-gray-800 mb-1">Jenis Barang</label>
+            <div
+              className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg bg-white text-gray-800 cursor-pointer flex justify-between items-center hover:border-gray-400 transition-colors duration-200"
+              onClick={() => setIsOpenKondisi(!isOpenKondisi)}
+            >
+              <span className="text-sm">
+                {formData.kondisiBarang || "Pilih jenis barang"}
+              </span>
+              <img
+                src={arrowDown}
+                alt="arrowDown"
+                className={`w-3 transition-transform ${isOpenKondisi ? "rotate-180" : ""}`}
+              />
+            </div>
+            {isOpenKondisi && (
+              <div className="absolute z-50 w-full max-h-60 overflow-y-auto mt-1 bg-white shadow-lg rounded-lg border border-gray-200">
+                <ul className="p-2">
+                  {["Baru", "Layak Pakai"].map((item) => (
+                    <li
+                      key={item}
+                      className="cursor-pointer hover:bg-gray-100 p-2 text-sm rounded"
+                      onClick={() => handleKondisiChange(item)}
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Kolom Kanan */}
+        <div className="space-y-6">
+          {/* Deskripsi */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Deskripsi Barang</label>
+            <textarea 
+              rows="6" 
+              name="deskripsi"
+              value={formData.deskripsi}
+              onChange={handleChange}
+              placeholder="Jelaskan secara detail barang yang ingin anda upload" 
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#045394]"
+            />
+          </div>
+
+          {/* Provinsi */}
+          <div className="relative">
+            <label className="block text-sm font-semibold text-gray-800 mb-1">Provinsi</label>
+            <div
+              className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg bg-white text-gray-800 cursor-pointer flex justify-between items-center hover:border-gray-400 transition-colors duration-200"
+              onClick={() => setIsOpenProvinsi(!isOpenProvinsi)}
+            >
+              <div className="flex items-center gap-2">
+                <img src={locationIcon} alt="iconLocation" className="w-4" />
+                <span className="text-sm">
+                  {formData.provinsi || "Pilih Provinsi"}
+                </span>
+              </div>
+              <img
+                src={arrowDown}
+                alt="arrowDown"
+                className={`w-3 transition-transform ${isOpenProvinsi ? "rotate-180" : ""}`}
+              />
+            </div>
+            {isOpenProvinsi && (
+              <div className="absolute z-50 w-full max-h-60 overflow-y-auto mt-1 bg-white shadow-lg rounded-lg border border-gray-200">
+                <ul className="p-2">
+                  {Indonesia.map((provinsi) => (
+                    <li
+                      key={provinsi.namaProvinsi}
+                      className="cursor-pointer hover:bg-gray-100 p-2 text-sm rounded"
+                      onClick={() => handleProvinsiChange(provinsi.namaProvinsi)}
+                    >
+                      {provinsi.namaProvinsi}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+
+          {/* Kabupaten */}
+          {formData.provinsi && (
+            <div className="relative">
+              <label className="block text-sm font-semibold text-gray-800 mb-1">Kabupaten</label>
+              <div
+                className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg bg-white text-gray-800 cursor-pointer flex justify-between items-center hover:border-gray-400 transition-colors duration-200"
+                onClick={() => setIsOpenKabupaten(!isOpenKabupaten)}
+              >
+                <div className="flex items-center gap-2">
+                  <img src={locationIcon} alt="iconLocation" className="w-4" />
+                  <span className="text-sm">
+                    {formData.kabupaten || "Pilih Kabupaten"}
+                  </span>
+                </div>
+                <img
+                  src={arrowDown}
+                  alt="arrowDown"
+                  className={`w-3 transition-transform ${isOpenKabupaten ? "rotate-180" : ""}`}
+                />
+              </div>
+              {isOpenKabupaten && (
+                <div className="absolute z-50 w-full max-h-60 overflow-y-auto mt-1 bg-white shadow-lg rounded-lg border border-gray-200">
+                  <ul className="p-2">
+                    {kabupatenOptions.map((kabupaten) => (
+                      <li
+                        key={kabupaten}
+                        className="cursor-pointer hover:bg-gray-100 p-2 text-sm rounded"
+                        onClick={() => handleKabupatenChange(kabupaten)}
+                      >
+                        {kabupaten}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Tombol */}
+          <div className="text-right pt-4">
+            <button type="submit" className="bg-[#045394] hover:bg-[#110843] text-white px-8 py-3 rounded-lg transition-all duration-200 shadow-md">
+              Kirim Donasi
+            </button>
+          </div>
         </div>
       </form>
     </div>

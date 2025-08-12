@@ -71,88 +71,112 @@ export default function CardDonasi({
   return (
     <div
       onClick={handleClick}
-      className="rounded-[28px] shadow-[0px_0px_3px_1px_rgba(0,0,0,0.15)] border-1 p-4 w-full max-w-xs bg-white flex flex-col cursor-pointer hover:shadow-[0px_0px_10px_2px_rgba(0,0,0,0.15)] transition"
+      className="w-[290px] bg-white rounded-2xl shadow hover:shadow-xl transition duration-300 flex flex-col cursor-pointer overflow-hidden relative"
       key={id}
     >
-      {status === "tersedia" ? (
-        <span className="bg-[#FDE4C5] text-[#F79319] border-green-950 w-fit self-end mb-2 -mt-2 text-xs font-semibold px-3 py-1 rounded-full">
-          Tersedia
-        </span>
-      ) : (
-        status === "disalurkan" && (
-          <span className="bg-gray-300 text-gray-600 w-fit self-end mb-2 -mt-2 text-xs font-semibold px-3 py-1 rounded-full">
-            Disalurkan
-          </span>
-        )
-      )}
-      <div className="h-36 bg-gray-200 rounded-xl mb-4 overflow-hidden">
-        <img src={imageSrc} alt="donasi" className="object-cover w-full" /> :
-      </div>
-      <div className="flex flex-col flex-1">
-        <div
-          className={`flex justify-between ${
-            cardType === "artikel" ? "flex-col" : ""
-          }`}
-        >
-          <div className="font-extrabold">{title}</div>
-          <div className="text-xs text-gray-400 mt-1 self-end">{date}</div>
+      {/* Gambar */}
+      <div className="relative">
+        <div className="w-full h-48 bg-gray-200 overflow-hidden">
+          <img src={imageSrc} alt="donasi" className="w-full h-full object-cover" />
         </div>
-        <div className="text-xs text-gray-500">
-          Barang {jenisBarang == "bekas" ? "layak pakai" : jenisBarang}
-        </div>
-        <p className="text-sm text-gray-700 mt-2">
-          {displayText}
-          {isLongText && (
-            <span className="text-blue-500 ml-1">(Baca Selengkapnya)</span>
-          )}
-        </p>
-      </div>
-      <div className="flex gap-2 items-center justify-between mt-4">
-        <div className="flex gap-2 items-center">
-          {avatarSrc ? (
-            <img
-              src={avatarSrc}
-              alt="author"
-              className="aspect-[1/1] w-8 h-8 rounded-full object-cover mr-2"
-            />
-          ) : (
-            <img
-              src={personProfile}
-              alt="profile"
-              className="p-2 bg-gray-500 bg-opacity-75  h-10 rounded-full object-cover"
-            />
-          )}
-          <div>
-            <div className="text-sm font-medium">{author}</div>
-            <div className="text-xs text-gray-500">{location}</div>
+        
+        {/* Badge Status - Pojok Kiri Atas */}
+        {status === "tersedia" ? (
+          <div className="absolute top-3 left-3">
+            <span className="bg-green-200 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
+              Tersedia
+            </span>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
+        ) : (
+          status === "disalurkan" && (
+            <div className="absolute top-3 left-3">
+              <span className="bg-gray-300 text-gray-600 text-xs font-semibold px-3 py-1 rounded-full">
+                Disalurkan
+              </span>
+            </div>
+          )
+        )}
+
+        {/* Share & Save Buttons - Pojok Kanan Atas */}
+        <div className="absolute top-3 right-3 flex items-center gap-2">
           {cardType === "donasi" && (
             <button
               onClick={handleSave}
-              className=" w-5 h-5 rounded-full hover:bg-gray-100"
+              className="p-1.5 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-colors shadow-sm"
               aria-label="Simpan"
             >
               {isSaved ? (
-                <BsBookmarkFill className="w-5 h-5 text-primary" />
+                <BsBookmarkFill className="w-4 h-4 text-[#045394]" />
               ) : (
-                <BsBookmark className="w-5 h-5 text-gray-500" />
+                <BsBookmark className="w-4 h-4 text-gray-600 hover:text-[#045394]" />
               )}
             </button>
           )}
 
           <button
             onClick={handleShare}
-            className=" w-5 h-5 rounded-full hover:bg-gray-100"
+            className="p-1.5 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-colors shadow-sm"
             aria-label="Bagikan"
           >
             <img
               src={shareIcon}
               alt="Bagikan"
-              className="w-5 h-5 object-contain"
+              className="w-4 h-4 object-contain"
             />
           </button>
+        </div>
+      </div>
+
+      {/* Konten */}
+      <div className="p-4 flex flex-col justify-between flex-grow text-sm relative">
+        {/* Title */}
+        <div className="mb-2">
+          <h3 className="font-bold text-lg text-gray-900 leading-tight">{title}</h3>
+        </div>
+        
+        {/* Description */}
+        <p className="text-sm text-gray-700 mb-4 flex-grow">
+          {displayText}
+          {isLongText && (
+            <span className="text-blue-500 ml-1 cursor-pointer hover:underline">
+              (Baca Selengkapnya)
+            </span>
+          )}
+        </p>
+        
+        {/* Garis Pembatas */}
+        <div className="w-full h-px bg-gray-200 mb-3"></div>
+        
+        {/* Bottom Section */}
+        <div className="flex place-items-center">
+          {/* Profile, Name & Location - Pojok Kiri Bawah (2/3 width) */}
+          <div className="flex-[2] flex items-center gap-2">
+            {avatarSrc ? (
+              <img
+                src={avatarSrc}
+                alt="author"
+                className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+              />
+            ) : (
+              <img
+                src={personProfile}
+                alt="profile"
+                className="w-8 h-8 rounded-full object-cover bg-gray-200 flex-shrink-0"
+              />
+            )}
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-gray-900 truncate">{author}</p>
+              <p className="text-xs text-gray-500 break-words leading-relaxed">{location}</p>
+            </div>
+          </div>
+          
+          {/* Jenis Barang & Tanggal - Pojok Kanan Bawah (1/3 width) */}
+          <div className="flex-[1] flex flex-col text-right items-end">
+            <p className="text-xs text-gray-600 mb-1 bg-gray-100 w-fit py-1 px-2 rounded-full">
+              {jenisBarang === "bekas" ? "Layak pakai" : jenisBarang}
+            </p>
+            <span className="text-xs text-gray-500">{date}</span>
+          </div>
         </div>
       </div>
     </div>

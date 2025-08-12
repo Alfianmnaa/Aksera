@@ -49,7 +49,7 @@ export const ArtikelSection = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto py-20 mb-24 sm:px-6">
+    <div className="max-w-6xl mx-auto px-6 py-20 mb-24 ">
       <div className="flex flex-col sm:flex-row sm:justify-between px-8 sm:items-center mb-6 gap-2 sm:gap-0">
         <h2 className="text-3xl font-semibold text-left sm:text-left">Artikel</h2>
         <Link to={"artikel"} className="text-[#045394] md:text-sm text-xs text-left  hover:underline sm:text-right">

@@ -15,18 +15,18 @@ import PermohonanSaya from "./pages/PermohonanSaya";
 import ArtikelSaya from "./pages/ArtikelSaya";
 import EdiProfil from "./pages/EditProfil";
 import Navbar from "./components/Navbar/Navbar";
-import Navbar2 from "./components/Navbar/Navbar2";
 import Footer from "./components/Footer/Footer";
 import ProtectedRoute from "./components/Protected/ProtectedRoute";
 import ViewProfil from "./pages/ViewProfil";
 import NotFound from "./pages/NotFound";
 import BukuSaya from "./pages/BukuSaya";
-import FloatingMaskot from "./components/FloatingMaskot/FloatingMaskot";
-import UmmahBook from "./pages/UmmahBook";
-import UmmahPartner from "./pages/UmmahPatner";
 import BookDetail from "./pages/BookDetail";
 import AdminDashboard from "./pages/AdminDashboard";
 import { Beranda } from "./pages/Beranda";
+import Materi from "./pages/Materi";
+import SeraAi from "./pages/SeraAi";
+import { Leaderboard } from "./pages/Leaderboard";
+import Forum from "./pages/Forum";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -36,48 +36,28 @@ function ScrollToTop() {
   return null;
 }
 
-function NavbarWrapper() {
-  const location = useLocation();
-  const [scrolling, setScrolling] = useState(false);
-  useEffect(() => {
-    function handleScroll() {
-      if (window.scrollY > 1) {
-        setScrolling(true);
-      } else {
-        setScrolling(false);
-      }
-    }
-    if (location.pathname === "/" || location.pathname === "/lihat-donasi") {
-      window.addEventListener("scroll", handleScroll);
-    } else {
-      setScrolling(false);
-    }
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [location.pathname]);
-
-  if (location.pathname === "/" || location.pathname === "/lihat-donasi") {
-    return scrolling ? <Navbar /> : <Navbar2 />;
-  }
-  return <Navbar />;
-}
-
 function App() {
+  const { pathname } = useLocation();
+
+  const hideNavbarPaths = ["/admin-dashboard"];
+
+  const shouldShowNavbar = !hideNavbarPaths.includes(pathname);
   return (
     <>
-      <NavbarWrapper />
+      {shouldShowNavbar && <Navbar />}
       <ScrollToTop />
 
       <Routes>
         <Route path="/" element={<Beranda />} />
-        <Route path="/ummah-book" element={<UmmahBook />} />
+        <Route path="/edukasi/materi" element={<Materi />} />
         <Route path="/book/:id" element={<BookDetail />} />
-        <Route path="/ummah-partner" element={<UmmahPartner />} />
+        <Route path="/edukasi/sera-ai" element={<SeraAi />} />
+        <Route path="/edukasi/forum-diskusi" element={<Forum />} />
         <Route path="/daftar" element={<Daftar />} />
         <Route path="/masuk" element={<Masuk />} />
         <Route path="/artikel" element={<Artikel />} />
         <Route path="/upload-donasi" element={<UploadDonasi />} />
+        <Route path="/donasi/leaderboard" element={<Leaderboard />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route
           path="/permohonan-saya"

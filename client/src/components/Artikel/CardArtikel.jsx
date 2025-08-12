@@ -2,23 +2,14 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Share2, Copy, Facebook, Twitter, MessageCircle } from "lucide-react";
 
-export default function CardArtikel({ 
-  id, 
-  title, 
-  description, 
-  imageSrc, 
-  date, 
-  username, 
-  avatarSrc, 
-  handleClick 
-}) {
+export default function CardArtikel({ id, title, description, imageSrc, date, username, avatarSrc, handleClick }) {
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
   const isLongText = description?.length > 100;
   const displayText = isLongText ? description.slice(0, 100) + "..." : description;
 
   const handleShare = async (platform) => {
-    const url = window.location.href + '/' + id;
+    const url = window.location.href + "/" + id;
     const text = title;
 
     switch (platform) {
@@ -132,11 +123,7 @@ export default function CardArtikel({
 
         {/* Read More Link */}
         <div className="flex justify-end">
-          <Link
-            to={`/artikel/${id}`}
-            onClick={(e) => e.stopPropagation()}
-            className="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center gap-1"
-          >
+          <Link to={`/artikel/detail-artikel/${id}`} onClick={(e) => e.stopPropagation()} className="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center gap-1">
             Baca selengkapnya
             <span>→</span>
           </Link>

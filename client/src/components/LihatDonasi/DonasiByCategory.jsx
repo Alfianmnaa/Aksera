@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import CardDonasi from "./CardDonasi";
-import { CardSkleton } from "./CardSkleton";
+import { CardDonasiSkeleton } from "./CardDonasiSkeleton";
 import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../config";
+import { Grid3X3, GraduationCap, Smartphone, Accessibility } from "lucide-react";
 
 const categories = ["Semua", "Pendidikan", "Elektronik", "Disabilitas"];
 
@@ -81,26 +82,27 @@ export default function DonasiByCategory() {
         );
 
   return (
-    <div className="max-w-5xl mx-auto px-6 pb-12 sm:py-12 md:px-8">
+    <section className="max-w-5xl mx-auto px-4 py-16">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
-        <h2 className="ext-xl sm:text-2xl font-bold">
-          Donasi Berdasarkan Kategori
-        </h2>
-      </div>
+      <h2 className="text-3xl font-bold text-gray-800 mb-10 text-center">Donasi Berdasarkan Kategori</h2>
 
-      {/* Filter Buttons */}
-      <div className="flex gap-4 mb-6 flex-wrap">
+      {/* Filter Buttons - Sesuai dengan HTML */}
+      <div className="flex flex-wrap justify-center gap-4 mb-12">
         {categories.map((category, index) => (
           <button
             key={index}
             onClick={() => setActiveCategory(category)}
-            className={`py-3 px-5 rounded-md border text-sm ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border border-[#045394] font-semibold shadow transition text-sm ${
               activeCategory === category
-                ? "bg-primary text-white"
-                : "bg-white text-primary border-grey-500"
-            } hover:shadow-lg transition`}
+                ? "bg-[#045394] text-white"
+                : "bg-white text-[#045394] hover:bg-[#045394] hover:text-white"
+            }`}
           >
+            {/* Icons sesuai kategori */}
+            {category === "Semua" && <Grid3X3 size={16} />}
+            {category === "Pendidikan" && <GraduationCap size={16} />}
+            {category === "Elektronik" && <Smartphone size={16} />}
+            {category === "Disabilitas" && <Accessibility size={16} />}
             {category}
           </button>
         ))}
@@ -112,32 +114,29 @@ export default function DonasiByCategory() {
           {Array(6)
             .fill(null)
             .map((_, idx) => (
-              <CardSkleton key={idx} />
+              <CardDonasiSkeleton key={idx} />
             ))}
         </div>
       ) : (
-        <div className="flex gap-6 justify-center flex-wrap">
+        /* Cards - Gunakan flex dan center sesuai HTML */
+        <div className="flex flex-wrap justify-center gap-6">
           {filteredDonations.length > 0 ? (
             filteredDonations.map((item) => (
-              <div
+              <CardDonasi
                 key={item.id}
-                className="w-full sm:w-[48%] md:w-[31%] flex justify-center"
-              >
-                <CardDonasi
-                  id={item.id}
-                  title={item.title}
-                  kategoriBarang={item.kategoriBarang}
-                  jenisBarang={item.jenisBarang}
-                  status={item.status}
-                  date={item.date}
-                  description={item.description}
-                  author={item.author}
-                  location={item.location}
-                  imageSrc={item.imageSrc}
-                  avatarSrc={item.avatarSrc}
-                  handleClick={() => handleClick(item.id)}
-                />
-              </div>
+                id={item.id}
+                title={item.title}
+                kategoriBarang={item.kategoriBarang}
+                jenisBarang={item.jenisBarang}
+                status={item.status}
+                date={item.date}
+                description={item.description}
+                author={item.author}
+                location={item.location}
+                imageSrc={item.imageSrc}
+                avatarSrc={item.avatarSrc}
+                handleClick={() => handleClick(item.id)}
+              />
             ))
           ) : (
             <p className="text-center text-gray-500">
@@ -146,6 +145,6 @@ export default function DonasiByCategory() {
           )}
         </div>
       )}
-    </div>
+    </section>
   );
 }

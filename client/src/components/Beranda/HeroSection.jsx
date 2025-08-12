@@ -8,7 +8,7 @@ export const HeroSection = () => {
   let buttonText1 = "Donasi Sekarang";
   let buttonText2 = "Belajar Sekarang";
   let targetPath = "/lihat-donasi";
-  let targetPath2 = "/ummah-book";
+  let targetPath2 = "/edukasi/materi";
 
   return (
     <section className="relative h-screen w-full bg-black">

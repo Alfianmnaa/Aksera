@@ -4,8 +4,7 @@ const Schema = mongoose.Schema;
 const DetilUserSchema = new Schema(
   {
     detilUid: {
-      type: mongoose.Schema.Types.ObjectId, // <-- DIUBAH MENJADI ObjectId
-      ref: "User", // <-- Tambahkan referensi ke model User
+      type: String,
       required: true,
     },
     namaLengkap: {
@@ -37,7 +36,7 @@ const DetilUserSchema = new Schema(
       default: "",
     },
     permohonanBarang: {
-      type: Array, // Pertimbangkan jika ini harus menjadi ObjectId referensi jika isinya ID
+      type: Array,
       default: [],
     },
   },

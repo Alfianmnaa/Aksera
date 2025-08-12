@@ -11,8 +11,7 @@ exports.buatDonasi = async (req, res) => {
       permohonan: [],
       namaStatus: "tersedia",
       deskripsiStatus: "",
-      // komunitasPengambilId: "", // <--- BARIS INI DIHAPUS/DIKOMENTARI
-      // Biarkan ini kosong agar default: null dari skema digunakan
+      komunitasPengambilId: "",
     });
 
     const simpanDetilDonasi = await detilDonasiBaru.save();

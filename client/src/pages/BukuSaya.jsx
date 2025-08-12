@@ -2,8 +2,8 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { axiosInstance } from "../config";
 import { UserContext } from "../context/UserContext";
-import BookCard from "../components/UmmahBook/BookCard";
-import BookCardSkeleton from "../components/UmmahBook/BookCardSkeleton";
+import BookCard from "../components/Materi/BookCard";
+import BookCardSkeleton from "../components/Materi/BookCardSkeleton";
 import donaturSampul from "../assets/BukuSaya/donaturSampul.png";
 import komunitasSampul from "../assets/BukuSaya/komunitasSampul.png";
 import editProfilButton from "../assets/PermohonanSaya/editProfilButton.png";
@@ -11,6 +11,8 @@ import personProfile from "../assets/Navbar/personProfile.png";
 
 export function Profil() {
   const [detilUser, setDetilUser] = useState(null);
+  const [activeTab, setActiveTab] = useState("materi");
+
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -86,13 +88,33 @@ export function Profil() {
 // Komponen TabSelector (diambil dari kode Anda)
 function TabSelector({ activeTab, setActiveTab }) {
   return (
-    <div className="flex px-6 mb-8 font-medium">
-      <button className={`px-5 border-b-2 md:text-md text-sm border-0 bg-transparent rounded-none pb-2 ${activeTab === "buku" ? "text-primary border-primary" : "text-gray-500"}`} onClick={() => setActiveTab("buku")}>
-        Materi Saya
-      </button>
-      <button className={`px-5 border-b-2 md:text-md text-sm border-0 bg-transparent rounded-none pb-2 ${activeTab === "disimpan" ? "text-primary border-primary" : "text-gray-500"}`} onClick={() => setActiveTab("disimpan")}>
-        Disimpan
-      </button>
+    <div className="px-6 mt-4 mb-12">
+      <div className="flex bg-gray-100 rounded-lg p-1 relative max-w-md">
+        <div className={`absolute top-1 bottom-1 transition-transform duration-300 ease-in-out transform ${activeTab === "materi" ? "translate-x-1" : "translate-x-full"} w-[calc(50%-2px)] bg-white rounded-md shadow-md left-[0px]`} />
+        <button
+          onClick={() => setActiveTab("materi")}
+          className={`flex-1 py-2 px-4 rounded-md md:text-sm text-xs font-medium transition-all duration-300 relative z-10 flex items-center justify-center gap-2 ${
+            activeTab === "materi" ? "text-primary transform scale-105" : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
+            <path d="M14 3v5h5M16 13H8M16 17H8M10 9H8" />
+          </svg>
+          Materi
+        </button>
+        <button
+          onClick={() => setActiveTab("disimpan")}
+          className={`flex-1 py-2 px-4 rounded-md md:text-sm text-xs font-medium transition-all duration-300 relative z-10 flex items-center justify-center gap-2 ${
+            activeTab === "disimpan" ? "text-primary transform scale-105" : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
+          </svg>
+          Disimpan
+        </button>
+      </div>
     </div>
   );
 }
@@ -219,7 +241,7 @@ function Disimpan() {
 export default function BukuSaya() {
   const [uploadedBooks, setUploadedBooks] = useState([]); // Mengganti 'books' menjadi 'uploadedBooks'
   const [filter, setFilter] = useState("Terbaru");
-  const [activeTab, setActiveTab] = useState("buku"); // 'buku' untuk materi yang diupload, 'disimpan' untuk materi yang disimpan
+  const [activeTab, setActiveTab] = useState("materi"); // 'buku' untuk materi yang diupload, 'disimpan' untuk materi yang disimpan
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -257,7 +279,7 @@ export default function BukuSaya() {
   }, [user, filter]);
 
   useEffect(() => {
-    if (activeTab === "buku") {
+    if (activeTab === "materi") {
       fetchUploadedBooks();
     }
   }, [activeTab, fetchUploadedBooks]);
@@ -273,7 +295,7 @@ export default function BukuSaya() {
         {" "}
         {/* Menyesuaikan margin bawah */}
         <TabSelector activeTab={activeTab} setActiveTab={setActiveTab} />
-        {activeTab === "buku" ? (
+        {activeTab === "materi" ? (
           <>
             <FilterSection filter={filter} handleFilterChange={handleFilterChange} itemCount={uploadedBooks.length} />
             <div className="px-4 sm:px-6 md:px-8">

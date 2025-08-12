@@ -9,31 +9,32 @@ export default function HasilPencarian({ resultData, cardType = "donasi" }) {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-6 pb-12 sm:py-12 md:px-8">
-      <div className="flex justify-between items-center sm:items-center gap-2 mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold">Hasil Pencarian</h2>
+    <section className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:px-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-center sm:text-left">Hasil Pencarian</h2>
       </div>
-      <div className="flex gap-4 flex-wrap justify-center">
+      
+      {/* Gunakan flex dan center sesuai HTML */}
+      <div className="flex flex-wrap justify-center gap-6">
         {resultData.map((item) => (
-          <div className="w-full sm:w-[48%] md:w-[31%] flex justify-center">
-            <CardDonasi
-              id={item.id}
-              title={item.title}
-              kategoriBarang={item.kategoriBarang}
-              status={item.status}
-              jenisBarang={item.jenisBarang}
-              date={item.date}
-              description={item.description}
-              author={item.author}
-              location={item.location}
-              imageSrc={item.imageSrc}
-              avatarSrc={item.avatarSrc}
-              handleClick={() => handleClick(item.id)}
-              cardType={cardType}
-            />
-          </div>
+          <CardDonasi
+            key={item.id}
+            id={item.id}
+            title={item.title}
+            kategoriBarang={item.kategoriBarang}
+            status={item.status}
+            jenisBarang={item.jenisBarang}
+            date={item.date}
+            description={item.description}
+            author={item.author}
+            location={item.location}
+            imageSrc={item.imageSrc}
+            avatarSrc={item.avatarSrc}
+            handleClick={() => handleClick(item.id)}
+            cardType={cardType}
+          />
         ))}
       </div>
-    </div>
+    </section>
   );
 }

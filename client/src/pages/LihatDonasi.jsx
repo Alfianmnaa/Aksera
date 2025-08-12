@@ -4,7 +4,7 @@ import HasilPencarian from "../components/LihatDonasi/HasilPencarian";
 import DonasiTersedia from "../components/LihatDonasi/DonasiTersedia";
 import DonasiDisalurkan from "../components/LihatDonasi/DonasiDisalurkan";
 import DonasiByCategory from "../components/LihatDonasi/DonasiByCategory";
-import { CardSkleton } from "../components/LihatDonasi/CardSkleton";
+import { CardDonasiSkeleton } from "../components/LihatDonasi/CardDonasiSkeleton";
 
 function LihatDonasi() {
   const [donations, setDonations] = useState([]);
@@ -19,15 +19,15 @@ function LihatDonasi() {
   }, [donations]);
 
   return (
-    <>
+    <div className="bg-[#f6f9fc] min-h-screen">
       <CariDonasiForm setDonations={setDonations} loading={loading} setLoading={setLoading} setIsSearched={setIsSearched} />
       {loading ? (
-        <div className="max-w-5xl mx-auto px-6 pb-12 sm:py-12 md:px-8">
-          <div className="flex flex-wrap gap-4 sm:gap-6 justify-center">
+        <div className="max-w-5xl mx-auto px-4 pb-12 sm:py-12 md:px-8">
+          <div className="flex flex-wrap justify-center gap-6">
             {Array(6)
               .fill(null)
               .map((_, idx) => (
-                <CardSkleton key={idx} />
+                <CardDonasiSkeleton key={idx} />
               ))}
           </div>
         </div>
@@ -43,9 +43,9 @@ function LihatDonasi() {
         )
       ) : null}{" "}
       <DonasiTersedia />
-      <DonasiDisalurkan />
+      {/* <DonasiDisalurkan /> */}
       <DonasiByCategory />
-    </>
+    </div>
   );
 }
 

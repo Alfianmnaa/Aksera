@@ -15,6 +15,7 @@ const detilDonasiRoutes = require("./src/routers/detilDonasi");
 const artikelRoutes = require("./src/routers/artikel");
 const materiRoutes = require("./src/routers/ebook");
 const chatRoutes = require("./src/routers/chat");
+const leaderboardRoutes = require("./src/routers/leaderboard");
 // const apiKeyMiddleware = require("./src/middleware/apiKeyMiddleware");
 
 dotenv.config();
@@ -22,7 +23,7 @@ app.use(bodyParser.json());
 app.use(express.json());
 
 const corsOptions = {
-  origin: ["https://lenteraumat.netlify.app", "https://lenteraumat.netlify.app/", "http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "http://localhost:4000"],
+  origin: ["https://aksera.netlify.app", "https://aksera.netlify.app/", "http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "http://localhost:4000"],
   credentials: true,
 };
 
@@ -40,6 +41,7 @@ app.use("/donasi/detil", detilDonasiRoutes);
 app.use("/artikel", artikelRoutes);
 app.use("/materi", materiRoutes);
 app.use("/chat", chatRoutes);
+app.use("/leaderboard", leaderboardRoutes);
 
 // get test api
 app.get("/", (req, res) => {

@@ -4,15 +4,13 @@ const Schema = mongoose.Schema;
 const DetilDonasiSchema = new Schema(
   {
     donasiId: {
-      type: mongoose.Schema.Types.ObjectId, // <-- DIUBAH MENJADI ObjectId
-      ref: "Donasi", // <-- Tambahkan referensi ke model Donasi
+      type: String,
       required: true,
     },
     permohonan: [
       {
         pemohonId: {
-          type: mongoose.Schema.Types.ObjectId, // <-- DIUBAH MENJADI ObjectId
-          ref: "User", // <-- Tambahkan referensi ke model User
+          type: String,
           required: true,
         },
         tujuanPermohonan: {
@@ -30,9 +28,8 @@ const DetilDonasiSchema = new Schema(
       default: "",
     },
     komunitasPengambilId: {
-      type: mongoose.Schema.Types.ObjectId, // <-- DIUBAH MENJADI ObjectId
-      ref: "User", // <-- Tambahkan referensi ke model User (asumsi komunitas adalah user dengan role komunitas)
-      default: null, // Mengubah dari "" ke null, karena ObjectId kosong tidak valid
+      type: String,
+      default: "",
     },
   },
   { timestamps: true }

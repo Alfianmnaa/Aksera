@@ -89,12 +89,8 @@ export default function DonasiSaya() {
 
         {activeTab === "donasi" ? (
           <>
-            <FilterSection 
-              filter={filter} 
-              handleFilterChange={handleFilterChange} 
-              itemCount={donations.filter(item => item.status === "tersedia").length} 
-            />
-            <div className="flex gap-4 flex-wrap justify-start">
+            <FilterSection filter={filter} handleFilterChange={handleFilterChange} itemCount={donations.filter((item) => item.status === "tersedia").length} />
+            <div className="px-4 flex gap-4 flex-wrap sm:justify-start justify-center">
               {loading && (
                 <div className="flex flex-wrap justify-start gap-4">
                   {Array(6)
@@ -107,7 +103,7 @@ export default function DonasiSaya() {
 
               {!loading && donations.length === 0 && <p>Tidak ada donasi ditemukan.</p>}
               {donations
-                ?.filter(item => filter === "Semua" ? true : item.status === filter)
+                ?.filter((item) => (filter === "Semua" ? true : item.status === filter))
                 ?.map((item) => (
                   <CardDonasiSaya key={item.id} {...item} />
                 ))}
@@ -184,35 +180,27 @@ function TabSelector({ activeTab, setActiveTab }) {
   return (
     <div className="px-6 mt-4 mb-12">
       <div className="flex bg-gray-100 rounded-lg p-1 relative max-w-md">
-        <div
-          className={`absolute top-1 bottom-1 transition-transform duration-300 ease-in-out transform ${
-            activeTab === "donasi" ? "translate-x-1" : "translate-x-full"
-          } w-[calc(50%-2px)] bg-white rounded-md shadow-md left-[0px]`}
-        />
+        <div className={`absolute top-1 bottom-1 transition-transform duration-300 ease-in-out transform ${activeTab === "donasi" ? "translate-x-1" : "translate-x-full"} w-[calc(50%-2px)] bg-white rounded-md shadow-md left-[0px]`} />
         <button
           onClick={() => setActiveTab("donasi")}
           className={`flex-1 py-2 px-4 rounded-md md:text-sm text-xs font-medium transition-all duration-300 relative z-10 flex items-center justify-center gap-2 ${
-            activeTab === "donasi" 
-              ? "text-primary transform scale-105" 
-              : "text-gray-600 hover:text-gray-900"
+            activeTab === "donasi" ? "text-primary transform scale-105" : "text-gray-600 hover:text-gray-900"
           }`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-            <path d="M14 3v5h5M16 13H8M16 17H8M10 9H8"/>
+            <path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
+            <path d="M14 3v5h5M16 13H8M16 17H8M10 9H8" />
           </svg>
           Donasi Saya
         </button>
         <button
           onClick={() => setActiveTab("disimpan")}
           className={`flex-1 py-2 px-4 rounded-md md:text-sm text-xs font-medium transition-all duration-300 relative z-10 flex items-center justify-center gap-2 ${
-            activeTab === "disimpan" 
-              ? "text-primary transform scale-105" 
-              : "text-gray-600 hover:text-gray-900"
+            activeTab === "disimpan" ? "text-primary transform scale-105" : "text-gray-600 hover:text-gray-900"
           }`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
+            <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
           </svg>
           Disimpan
         </button>
@@ -226,9 +214,9 @@ function FilterSection({ filter, handleFilterChange, itemCount }) {
   const pendingDonations = itemCount || 0;
 
   const filterOptions = [
-    { value: 'Semua', icon: 'list', label: 'Semua' },
-    { value: 'tersedia', icon: 'clock', label: 'Menunggu' },
-    { value: 'disalurkan', icon: 'check', label: 'Disalurkan' }
+    { value: "Semua", icon: "list", label: "Semua" },
+    { value: "tersedia", icon: "clock", label: "Menunggu" },
+    { value: "disalurkan", icon: "check", label: "Disalurkan" },
   ];
 
   const handleOptionClick = (value) => {
@@ -243,14 +231,14 @@ function FilterSection({ filter, handleFilterChange, itemCount }) {
         {pendingDonations > 0 && (
           <div className="flex items-center gap-2 bg-yellow-50 px-3 py-1 rounded-full self-start">
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-yellow-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M12 6v6l4 2"/>
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 6v6l4 2" />
             </svg>
             <span className="text-sm text-yellow-800">{pendingDonations} menunggu</span>
           </div>
         )}
       </div>
-      
+
       <div className="relative w-full sm:w-auto">
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -261,42 +249,39 @@ function FilterSection({ filter, handleFilterChange, itemCount }) {
           <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
           </svg>
-          <span className="flex-1 text-center text-sm">{filterOptions.find(opt => opt.value === filter)?.label || filter}</span>
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth="2" 
-            strokeLinecap="round" 
+          <span className="flex-1 text-center text-sm">{filterOptions.find((opt) => opt.value === filter)?.label || filter}</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
             strokeLinejoin="round"
           >
-            <path d="m6 9 6 6 6-6"/>
+            <path d="m6 9 6 6 6-6" />
           </svg>
         </button>
 
         {isOpen && (
           <>
-            <div 
-              className="fixed inset-0 bg-transparent" 
-              onClick={() => setIsOpen(false)}
-            />
+            <div className="fixed inset-0 bg-transparent" onClick={() => setIsOpen(false)} />
             <div className="absolute right-0 mt-1 w-full min-w-[160px] bg-white rounded-md shadow-lg border border-gray-200 py-1 z-50">
               {filterOptions.map((option) => (
                 <button
                   key={option.value}
                   onClick={() => handleOptionClick(option.value)}
                   className={`w-full px-3 py-2 text-sm text-left hover:bg-gray-50 flex items-center gap-2
-                    ${filter === option.value ? 'text-primary bg-primary/5 font-medium' : 'text-gray-700'}
+                    ${filter === option.value ? "text-primary bg-primary/5 font-medium" : "text-gray-700"}
                     transition-colors duration-150`}
                 >
                   {filter === option.value && (
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12"/>
+                      <polyline points="20 6 9 17 4 12" />
                     </svg>
                   )}
-                  <span className={filter === option.value ? 'ml-0' : 'ml-6'}>{option.label}</span>
+                  <span className={filter === option.value ? "ml-0" : "ml-6"}>{option.label}</span>
                 </button>
               ))}
             </div>
@@ -334,12 +319,8 @@ function CardDonasiSaya({ id, title, kategoriBarang, jenisBarang, status, jumlah
   };
   return (
     <div onClick={handleClick} className="rounded-[28px] shadow-[0px_0px_3px_1px_rgba(0,0,0,0.15)] border-1 p-4 w-full max-w-xs bg-white flex flex-col cursor-pointer hover:shadow-[0px_0px_10px_2px_rgba(0,0,0,0.15)] transition">
-      <span className={`w-fit self-end mb-2 -mt-2 text-xs font-semibold px-3 py-1 rounded-full ${
-        status === 'tersedia' 
-          ? 'bg-yellow-100 text-yellow-800'
-          : 'bg-green-100 text-green-800'
-      }`}>
-        {status === 'tersedia' ? 'Menunggu' : 'Disalurkan'}
+      <span className={`w-fit self-end mb-2 -mt-2 text-xs font-semibold px-3 py-1 rounded-full ${status === "tersedia" ? "bg-yellow-100 text-yellow-800" : "bg-green-100 text-green-800"}`}>
+        {status === "tersedia" ? "Menunggu" : "Disalurkan"}
       </span>
       <div className="h-36 bg-gray-200 rounded-lg mb-4 overflow-hidden">
         <img src={imageSrc} alt="donasi" className="object-cover w-full h-full" />

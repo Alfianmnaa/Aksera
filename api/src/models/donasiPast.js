@@ -4,8 +4,7 @@ const Schema = mongoose.Schema;
 const DonasiSchema = new Schema(
   {
     donasiUid: {
-      type: mongoose.Schema.Types.ObjectId, // <-- DIUBAH MENJADI ObjectId
-      ref: "User", // <-- Tambahkan referensi ke model User
+      type: String,
       required: true,
     },
     namaBarang: {
@@ -36,7 +35,6 @@ const DonasiSchema = new Schema(
       type: String,
       required: true,
     },
-
     disimpan: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true }

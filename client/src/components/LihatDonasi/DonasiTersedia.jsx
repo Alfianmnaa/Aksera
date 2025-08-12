@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import CardDonasi from "./CardDonasi";
 import { axiosInstance } from "../../config";
-import { CardSkleton } from "./CardSkleton";
+import { CardDonasiSkeleton } from "./CardDonasiSkeleton";
 
 export default function DonasiTersedia() {
   const [semuaData, setSemuaData] = useState([]);
@@ -76,13 +76,13 @@ export default function DonasiTersedia() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:px-8">
+    <section className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:px-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold">Donasi Tersedia</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-center sm:text-left">Donasi Tersedia</h2>
         <Link
           to="/lihat-semua-donasi?status=tersedia"
-          className="text-[#F79319] text-sm sm:text-base hover:underline"
+          className="text-blue-600 text-sm sm:text-base hover:underline"
         >
           Lihat semua
         </Link>
@@ -90,11 +90,11 @@ export default function DonasiTersedia() {
 
       {/* Status Feedback */}
       {loading && (
-        <div className="flex flex-wrap justify-center gap-4">
+        <div className="flex flex-wrap justify-center gap-6">
           {Array(3)
             .fill(null)
             .map((_, idx) => (
-              <CardSkleton key={idx} />
+              <CardDonasiSkeleton key={idx} />
             ))}
         </div>
       )}
@@ -103,30 +103,26 @@ export default function DonasiTersedia() {
         <p>Tidak ada donasi tersedia saat ini.</p>
       )}
 
-      {/* Cards grid */}
-      <div className="flex flex-wrap gap-4 sm:gap-6 justify-center">
+      {/* Cards grid - Gunakan flex dan center sesuai HTML */}
+      <div className="flex flex-wrap justify-center gap-6">
         {semuaData.slice(0, 3).map((item) => (
-          <div
+          <CardDonasi
             key={item.id}
-            className="w-full sm:w-[48%] md:w-[31%] flex justify-center"
-          >
-            <CardDonasi
-              id={item.id}
-              title={item.title}
-              kategoriBarang={item.kategoriBarang}
-              jenisBarang={item.jenisBarang}
-              status={item.status}
-              date={item.date}
-              description={item.description}
-              author={item.author}
-              location={item.location}
-              imageSrc={item.imageSrc}
-              avatarSrc={item.avatarSrc}
-              handleClick={() => handleClick(item.id)}
-            />
-          </div>
+            id={item.id}
+            title={item.title}
+            kategoriBarang={item.kategoriBarang}
+            jenisBarang={item.jenisBarang}
+            status={item.status}
+            date={item.date}
+            description={item.description}
+            author={item.author}
+            location={item.location}
+            imageSrc={item.imageSrc}
+            avatarSrc={item.avatarSrc}
+            handleClick={() => handleClick(item.id)}
+          />
         ))}
       </div>
-    </div>
+    </section>
   );
 }

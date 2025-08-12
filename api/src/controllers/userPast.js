@@ -1,6 +1,5 @@
 const UserSchema = require("../models/auth");
 const DetilUserSchema = require("../models/detilUser");
-const mongoose = require("mongoose"); // Impor mongoose untuk ObjectId
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -46,8 +45,8 @@ exports.hapusAkun = async (req, res) => {
       return res.status(404).json("User tidak ditemukan");
     }
 
-    // Hapus detil user berdasarkan user._id (sekarang ObjectId)
-    await DetilUserSchema.findOneAndDelete({ detilUid: user._id });
+    // Hapus detil user berdasarkan user._id
+    await DetilUserSchema.findOneAndDelete({ detilUid: user._id.toString() });
 
     // Hapus user itu sendiri
     await UserSchema.findByIdAndDelete(req.params.id);
