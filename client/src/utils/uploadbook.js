@@ -3,8 +3,8 @@ import axios from "axios";
 const uploadCloudinary = async (file) => {
   const data = new FormData();
   data.append("file", file);
-  data.append("upload_preset", "lib-collections"); // Ganti dengan preset upload Cloudinary Anda
-  data.append("cloud_name", "alfianmna"); // Ganti dengan Cloud Name Anda
+  data.append("upload_preset", "lib-collections");
+  data.append("cloud_name", "alfianmna");
 
   try {
     const res = await axios.post("https://api.cloudinary.com/v1_1/alfianmna/auto/upload", data);

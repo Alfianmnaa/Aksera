@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "../../assets/Navbar/logo.png"; // Pastikan path ini benar
-import LenteraUmatLogo2 from "../../assets/Navbar/lenteraumat.svg"; // Pastikan path ini benar
 import donateIcon from "../../assets/Navbar/donate.png";
 import bookIcon from "../../assets/Navbar/book.svg";
 import personEditIcon from "../../assets/Navbar/personEdit.png";
@@ -130,7 +129,6 @@ function Navbar({ navVariant = 1 }) {
           <div className="w-fit">
             <Link to="/" onClick={closeMenu}>
               {navVariant === 1 && <img src={Logo} className="w-32 940:w-36" alt="Lentera Umat Logo" />}
-              {navVariant === 2 && <img src={LenteraUmatLogo2} className="w-32 940:w-36" alt="Lentera Umat Logo" />}
             </Link>
           </div>
 

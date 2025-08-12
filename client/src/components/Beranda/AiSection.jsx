@@ -31,14 +31,14 @@ export const AiSection = () => {
               <div className="bg-[#219EBC] rounded-full p-4">
                 <img src={aiWhiteIcon} alt="AI Icon" className="md:w-8 md:h-8 w-6 h-6" />
               </div>
-              <h1 className="lg:text-5xl md:text-4xl text-3xl font-semibold text-[#1F2937]">Belajar Pakai AI</h1>
+              <h1 className="lg:text-5xl md:text-4xl text-3xl font-semibold text-[#1F2937]">Belajar Pakai Sera AI</h1>
             </div>
           </div>
 
           {/* Chat Box */}
           <div className="rounded-xl overflow-hidden shadow-lg bg-white">
             {/* Chat Header */}
-            <div className="bg-[#045394] text-white text-center py-5 font-semibold md:text-2xl text-xl">Ngobrol bareng helpAi</div>
+            <div className="bg-[#045394] text-white text-center py-5 font-semibold md:text-2xl text-xl">Ngobrol bareng Sera Ai</div>
 
             {/* Chat Content */}
             <div className="p-4 space-y-4 bg-white">
@@ -57,8 +57,8 @@ export const AiSection = () => {
               <div className="flex justify-start">
                 <div className="bg-[#F3F4F6] text-[#374151] p-3 rounded-lg max-w-[90%] md:max-w-[80%]">
                   <div className="flex items-center space-x-2 mb-2">
-                    <img src={aiIcon} alt="HelpAI Icon" className="w-5 h-5" />
-                    <span className="text-base font-semibold">helpAi</span>
+                    <img src={aiIcon} alt="seraAiIcon Icon" className="w-5 h-5" />
+                    <span className="text-base font-semibold">Sera Ai</span>
                   </div>
                   <p className="text-base leading-relaxed whitespace-pre-wrap">
                     {displayedText}
@@ -71,7 +71,7 @@ export const AiSection = () => {
             {/* Input Area */}
             <div className="p-4 border-t border-gray-200 bg-white">
               <div className="flex item-center gap-2">
-                <input type="text" placeholder="Tanya helpAi DiSini..." className="w-full py-3 pl-5 pr-12 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#045394] text-base" />
+                <input type="text" placeholder="Tanya Sera Ai DiSini..." className="w-full py-3 pl-5 pr-12 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#045394] text-base" />
                 <button className="bg-[#045394] rounded-full w-12 h-11 flex justify-center items-center">
                   <img src={sendIcon} alt="Send Icon" className="w-6 h-6" />
                 </button>

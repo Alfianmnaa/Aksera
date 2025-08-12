@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext, useRef } from "react";
 import { axiosInstance } from "../config";
 import Swal from "sweetalert2";
 import { UserContext } from "../context/UserContext";
+import seraIcon from "../assets/Beranda/blackIcon.svg";
 import {
   FaPaperPlane,
   FaRobot,
@@ -381,15 +382,18 @@ export default function SeraAi() {
     setPdfTextContent("");
     try {
       let pdfData;
+      let finalSource = source;
+
       if (typeof source === "string") {
-        pdfData = source;
+        finalSource = source.replace(/^http:\/\//i, "https://");
+        pdfData = finalSource;
       } else if (source instanceof File) {
         pdfData = await readFileAsArrayBuffer(source);
       } else {
         throw new Error("Invalid PDF source.");
       }
 
-      const loadingTask = pdfjs.getDocument(pdfData);
+      const loadingTask = pdfjs.getDocument(pdfData); // Use finalSource here
       const pdf = await loadingTask.promise;
       let fullText = "";
       for (let i = 1; i <= pdf.numPages; i++) {
@@ -848,7 +852,7 @@ export default function SeraAi() {
     if (currentMode === "chat" || currentMode === "askPdf" || currentMode === "summarizePdf") {
       return (
         <div className="flex-1 flex flex-col ">
-          <div ref={chatContainerRef} className="overflow-y-auto space-y-4 bg-gray-50 px-6 py-4 h-[calc(100vh-144px)]">
+          <div ref={chatContainerRef} className="overflow-y-auto space-y-4 bg-gray-50 px-6 py-4 md:h-[calc(100vh-144px)] h-[calc(100vh-380px)]">
             {chatHistory.length === 0 ? (
               <div className="text-center text-gray-500 mt-10 p-4 bg-white rounded-xl shadow-sm border border-gray-200">
                 <p className="text-lg mb-2">Halo, aku Sera AI!</p>
@@ -865,7 +869,8 @@ export default function SeraAi() {
                         </>
                       ) : (
                         <>
-                          <FaRobot className="mr-2 text-gray-600" /> Sera AI
+                          <img src={seraIcon} className="mr-2 text-gray-600" alt="seraAilogo" /> Sera AI
+                          {/* <FaRobot className="mr-2 text-gray-600" />  */}
                         </>
                       )}
                       <button
@@ -885,7 +890,8 @@ export default function SeraAi() {
               <div className="flex justify-start items-start">
                 <div className="max-w-[70%] p-4 rounded-xl shadow-md bg-gray-200 text-gray-800 rounded-bl-none">
                   <p className="font-semibold mb-1 flex items-center">
-                    <FaRobot className="mr-2 text-gray-600" /> Sera AI
+                    {/* <FaRobot className="mr-2 text-gray-600" /> */}
+                    <img src={seraIcon} className="mr-2 text-gray-600" alt="seraAilogo" /> Sera AI
                   </p>
                   <p className="flex items-center animate-pulse">
                     <FaSpinner className="animate-spin mr-2" /> mengetik...

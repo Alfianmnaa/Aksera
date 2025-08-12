@@ -6,13 +6,12 @@ import HeaderDaftar from "../components/Daftar/HeaderDaftar";
 import RegistrationTypeToggle from "../components/Daftar/RegistrationTypeToggle";
 import DonaturForm from "../components/Daftar/DonaturForm";
 import KomunitasForm from "../components/Daftar/KomunitasForm";
-import mascotImage from "../assets/Maskot/Luma1.png";
 
 export default function Daftar() {
   const [role, setRole] = useState("donatur");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -23,9 +22,9 @@ export default function Daftar() {
   });
 
   useEffect(() => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      role: role
+      role: role,
     }));
   }, [role]);
 
@@ -88,27 +87,14 @@ export default function Daftar() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fffbea] via-[#e8f5e9] to-[#e3f2fd] px-4 py-12">
       <div className="w-full max-w-lg bg-white rounded-lg shadow-sm p-10">
         <HeaderDaftar />
-        <RegistrationTypeToggle 
-          selectedType={role} 
-          setSelectedType={setRole}
-        />
+        <RegistrationTypeToggle selectedType={role} setSelectedType={setRole} />
 
         {/* Form */}
         <form onSubmit={handleDaftar} className="space-y-4">
           {role === "donatur" ? (
-            <DonaturForm 
-              formData={formData}
-              handleInputChange={handleInputChange}
-              showPassword={showPassword}
-              setShowPassword={setShowPassword}
-            />
+            <DonaturForm formData={formData} handleInputChange={handleInputChange} showPassword={showPassword} setShowPassword={setShowPassword} />
           ) : (
-            <KomunitasForm 
-              formData={formData}
-              handleInputChange={handleInputChange}
-              showPassword={showPassword}
-              setShowPassword={setShowPassword}
-            />
+            <KomunitasForm formData={formData} handleInputChange={handleInputChange} showPassword={showPassword} setShowPassword={setShowPassword} />
           )}
 
           {/* Submit Button */}
@@ -119,11 +105,11 @@ export default function Daftar() {
               transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg
               relative overflow-hidden group"
           >
-            <span className="absolute inset-0 bg-gradient-to-r from-primary/50 to-transparent 
-              transform -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
-            <span className="relative">
-              {loading ? "Loading..." : "Daftar"}
-            </span>
+            <span
+              className="absolute inset-0 bg-gradient-to-r from-primary/50 to-transparent 
+              transform -translate-x-full group-hover:translate-x-full transition-transform duration-700"
+            ></span>
+            <span className="relative">{loading ? "Loading..." : "Daftar"}</span>
           </button>
         </form>
 

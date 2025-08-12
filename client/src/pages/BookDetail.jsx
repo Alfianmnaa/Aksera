@@ -73,7 +73,7 @@ function BookDetail() {
   const downloadFile = async (url, fileName) => {
     try {
       const response = await fetch(url);
-      if (!response.ok) throw new Error("Network response was not ok.");
+      // if (!response.ok) throw new Error("Network response was not ok.");
       const blob = await response.blob();
       const blobURL = window.URL.createObjectURL(blob);
 
